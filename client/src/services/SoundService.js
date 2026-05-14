@@ -118,30 +118,9 @@ class SoundService {
     this.init();
     this.ambienceStarted = true;
 
-    // 1. RAIN NOISE (White Noise + Filter)
-    const bufferSize = 2 * this.ctx.sampleRate;
-    const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
-    }
-
-    const whiteNoise = this.ctx.createBufferSource();
-    whiteNoise.buffer = noiseBuffer;
-    whiteNoise.loop = true;
-
-    const rainFilter = this.ctx.createBiquadFilter();
-    rainFilter.type = 'lowpass';
-    rainFilter.frequency.value = 1000;
-
-    const rainGain = this.ctx.createGain();
-    rainGain.gain.value = 0.05; // Soft rain
-
-    whiteNoise.connect(rainFilter);
-    rainFilter.connect(rainGain);
-    rainGain.connect(this.ctx.destination);
-    whiteNoise.start();
-
+    // 1. RAIN NOISE (REMOVED)
+    const noiseBuffer = this.ctx.createBuffer(1, 2 * this.ctx.sampleRate, this.ctx.sampleRate);
+    
     // 2. WIND (Lower Frequency Noise modulation)
     const windFilter = this.ctx.createBiquadFilter();
     windFilter.type = 'lowpass';
@@ -159,50 +138,83 @@ class SoundService {
     windGain.connect(this.ctx.destination);
     windSource.start();
 
-    // 3. SPARSE PIANO (Simple sine wave notes)
-    const playNote = () => {
+    // 3. DISTANT WAR HORNS (Deep brassy blasts)
+    const playHorn = () => {
       if (!this.ambienceStarted) return;
-      const notes = [261.63, 293.66, 329.63, 392.00, 440.00]; // Pentatonic C
-      const freq = notes[Math.floor(Math.random() * notes.length)];
-      
       const osc = this.ctx.createOscillator();
       const g = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(80, this.ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(70, this.ctx.currentTime + 2.0);
+      
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 400;
       
       g.gain.setValueAtTime(0, this.ctx.currentTime);
-      g.gain.linearRampToValueAtTime(0.05, this.ctx.currentTime + 1.0);
+      g.gain.linearRampToValueAtTime(0.08, this.ctx.currentTime + 0.5);
+      g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 3.0);
+      
+      osc.connect(filter);
+      filter.connect(g);
+      g.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 3.0);
+      
+      setTimeout(playHorn, 15000 + Math.random() * 20000);
+    };
+    playHorn();
+
+    // 4. SCREAMING WINDS & CORRUPTION
+    const playCaelidAmbience = () => {
+      if (!this.ambienceStarted) return;
+      
+      // 4a. Hostile Wind Gust
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(100 + Math.random() * 50, this.ctx.currentTime);
+      
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1000 + Math.sin(this.ctx.currentTime) * 500;
+      
+      g.gain.setValueAtTime(0, this.ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0.015, this.ctx.currentTime + 1.0);
       g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 4.0);
       
-      osc.connect(g);
+      osc.connect(filter);
+      filter.connect(g);
       g.connect(this.ctx.destination);
       osc.start();
       osc.stop(this.ctx.currentTime + 4.0);
       
-      setTimeout(playNote, 5000 + Math.random() * 10000);
+      setTimeout(playCaelidAmbience, 6000 + Math.random() * 10000);
     };
-    playNote();
+    playCaelidAmbience();
 
-    // 4. BIRD CHIRPS
-    const playChirp = () => {
+    // 5. LIGHTNING STRIKE EVENT LISTENER
+    window.addEventListener('lightning_strike', () => {
       if (!this.ambienceStarted) return;
+      
       const osc = this.ctx.createOscillator();
       const g = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(2000 + Math.random() * 1000, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(3000 + Math.random() * 500, this.ctx.currentTime + 0.1);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(40 + Math.random()*20, this.ctx.currentTime);
       
-      g.gain.setValueAtTime(0.02, this.ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+      g.gain.setValueAtTime(1.2, this.ctx.currentTime); // Increased from 0.6
+      g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 4.0); // Longer decay
       
-      osc.connect(g);
+      const lowPass = this.ctx.createBiquadFilter();
+      lowPass.type = 'lowpass';
+      lowPass.frequency.value = 500;
+
+      osc.connect(lowPass);
+      lowPass.connect(g);
       g.connect(this.ctx.destination);
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.1);
-      
-      setTimeout(playChirp, 10000 + Math.random() * 20000);
-    };
-    playChirp();
+      osc.stop(this.ctx.currentTime + 3.0);
+    });
   }
 }
 

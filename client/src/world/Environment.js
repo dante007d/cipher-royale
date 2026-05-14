@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+const PARTICLE_COUNT = 400;
 
 export function setupEnvironment(scene) {
 
@@ -10,15 +11,44 @@ export function setupEnvironment(scene) {
   skyCanvas.height = 256;
   const skyCtx = skyCanvas.getContext('2d');
   
-  const dayGradient = skyCtx.createLinearGradient(0, 0, 0, 256);
-  dayGradient.addColorStop(0, '#2c3e50'); // Misty dark top
-  dayGradient.addColorStop(1, '#8a9ba8'); // Misty horizon
+  const skyGradient = skyCtx.createLinearGradient(0, 0, 0, 256);
+  skyGradient.addColorStop(0, '#000000'); // Pure Black
+  skyGradient.addColorStop(1, '#330000'); // Cursed Crimson Horizon
   
-  skyCtx.fillStyle = dayGradient;
+  skyCtx.fillStyle = skyGradient;
   skyCtx.fillRect(0, 0, 1, 256);
   
   const skyTex = new THREE.CanvasTexture(skyCanvas);
   scene.background = skyTex;
+
+  const createGlowTexture = (colorStr) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, colorStr);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(canvas);
+  };
+
+  // 1b. BLOOD MOON
+  const moonGeo = new THREE.SphereGeometry(15, 32, 32);
+  const moonMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const moon = new THREE.Mesh(moonGeo, moonMat);
+  moon.position.set(-60, 50, -80);
+  scene.add(moon);
+  
+  // Moon Glow
+  const moonGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: createGlowTexture('#ff0000'),
+    transparent: true,
+    opacity: 0.5,
+    blending: THREE.AdditiveBlending
+  }));
+  moonGlow.scale.set(60, 60, 1);
+  moon.add(moonGlow);
 
   // Clouds (White and fluffy for day)
   const clouds = new THREE.Group();
@@ -46,14 +76,24 @@ export function setupEnvironment(scene) {
   scene.add(clouds);
  
   // ═══════════════════════════════════════════════════════════════
-  // 2. DENSE GRASS SYSTEM (Restored outside arena)
-  // ═══════════════════════════════════════════════════════════════
-  const GRASS_COUNT = 80000; // Reduced for performance
+  // 2. GIANT SKELETAL RIBS (Background)
+  const ribMat = new THREE.MeshStandardMaterial({ color: 0xddccbb, roughness: 0.9 });
+  const ribGeo = new THREE.TorusGeometry(8, 0.5, 8, 24, Math.PI);
+  for(let i=0; i<6; i++) {
+    const rib = new THREE.Mesh(ribGeo, ribMat);
+    rib.position.set(-30 + i*12, -2, -40);
+    rib.rotation.y = Math.PI / 2;
+    rib.rotation.x = Math.PI / 6;
+    scene.add(rib);
+  }
+
+  // 3. DENSE ROT GRASS SYSTEM
+  const GRASS_COUNT = 80000;
   const grassGeo = new THREE.PlaneGeometry(0.12, 0.7);
   grassGeo.translate(0, 0.35, 0);
 
   const grassMat = new THREE.MeshStandardMaterial({
-    color: 0x4a554a,
+    color: 0x661111, // Rot-red grass
     roughness: 0.8,
     side: THREE.DoubleSide
   });
@@ -186,15 +226,132 @@ export function setupEnvironment(scene) {
     });
   });
 
-  scene.fog = new THREE.FogExp2(0x8a9ba8, 0.012); 
+  // ═══════════════════════════════════════════════════════════════
+  // 6. CIPHER PARTICLES (Floating digital bits)
+  // ═══════════════════════════════════════════════════════════════
+  const particleGeo = new THREE.BufferGeometry();
+  const positions = new Float32Array(PARTICLE_COUNT * 3);
+  const speeds = new Float32Array(PARTICLE_COUNT);
 
-  return { clouds, natureGroup, grassMesh };
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    positions[i * 3]     = (Math.random() - 0.5) * 60;
+    positions[i * 3 + 1] = Math.random() * 15;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 80;
+    speeds[i] = 0.1 + Math.random() * 0.5;
+  }
+
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  
+  const particleMat = new THREE.PointsMaterial({
+    color: 0x00ffff,
+    size: 0.08,
+    transparent: true,
+    opacity: 0.6,
+    blending: THREE.AdditiveBlending
+  });
+
+  const cipherParticles = new THREE.Points(particleGeo, particleMat);
+  scene.add(cipherParticles);
+
+  scene.fog = new THREE.FogExp2(0x440022, 0.03); // Sickly Scarlet Haze
+
+  // 7. ROT SPORES (Floating pink bits)
+  const sporeGeo = new THREE.BufferGeometry();
+  const sporePos = new Float32Array(500 * 3);
+  const sporeSpeeds = new Float32Array(500);
+  for(let i=0; i<500; i++) {
+    sporePos[i*3] = (Math.random()-0.5)*100;
+    sporePos[i*3+1] = Math.random()*20;
+    sporePos[i*3+2] = (Math.random()-0.5)*100;
+    sporeSpeeds[i] = 0.1 + Math.random()*0.3;
+  }
+  sporeGeo.setAttribute('position', new THREE.BufferAttribute(sporePos, 3));
+  const sporeMat = new THREE.PointsMaterial({ 
+    color: 0xff4477, size: 0.08, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending 
+  });
+  const spores = new THREE.Points(sporeGeo, sporeMat);
+  scene.add(spores);
+
+  // 8. SMOKE LAYER (Low hanging)
+  const smokeParticles = new THREE.Group();
+  const smokeGeo = new THREE.PlaneGeometry(10, 10);
+  const smokeMat = new THREE.MeshBasicMaterial({ 
+    color: 0x221111, transparent: true, opacity: 0.15, depthWrite: false 
+  });
+  for(let i=0; i<30; i++) {
+    const s = new THREE.Mesh(smokeGeo, smokeMat);
+    s.position.set((Math.random()-0.5)*40, 0.5+Math.random()*2, (Math.random()-0.5)*60);
+    s.rotation.x = -Math.PI/2;
+    s.scale.setScalar(1 + Math.random()*2);
+    smokeParticles.add(s);
+  }
+  scene.add(smokeParticles);
+
+  // 9. FIRE PITS & EMBERS
+  const emberGeo = new THREE.BufferGeometry();
+  const emberPos = new Float32Array(200 * 3);
+  for(let i=0; i<200; i++) {
+    emberPos[i*3] = (Math.random()-0.5)*30;
+    emberPos[i*3+1] = Math.random()*10;
+    emberPos[i*3+2] = (Math.random()-0.5)*50;
+  }
+  emberGeo.setAttribute('position', new THREE.BufferAttribute(emberPos, 3));
+  const emberMat = new THREE.PointsMaterial({ color: 0xffaa44, size: 0.05, transparent: true, blending: THREE.AdditiveBlending });
+  const embers = new THREE.Points(emberGeo, emberMat);
+  scene.add(embers);
+
+  return { clouds, natureGroup, grassMesh, cipherParticles, particleSpeeds: speeds, smokeParticles, embers, spores, sporeSpeeds };
 }
 
-export function updateEnvironment(env, delta) {
-  if (!env || !env.clouds) return;
-  env.clouds.children.forEach(cloud => {
-    cloud.position.x += cloud.userData.speed * delta * 0.3;
-    if (cloud.position.x > 150) cloud.position.x = -150;
-  });
+export function updateEnvironment(env, delta, time) {
+  if (!env) return;
+  
+  // Update Clouds
+  if (env.clouds) {
+    env.clouds.children.forEach(cloud => {
+      cloud.position.x += cloud.userData.speed * delta * 0.3;
+      if (cloud.position.x > 150) cloud.position.x = -150;
+    });
+  }
+
+  // Update Cipher Particles
+  if (env.cipherParticles) {
+    const pos = env.cipherParticles.geometry.attributes.position.array;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      pos[i * 3 + 1] += env.particleSpeeds[i] * delta * 0.5;
+      pos[i * 3]     += Math.sin(time + i) * 0.01;
+      if (pos[i * 3 + 1] > 15) pos[i * 3 + 1] = 0;
+    }
+    env.cipherParticles.geometry.attributes.position.needsUpdate = true;
+  }
+
+  // Update Embers (Float up)
+  if (env.embers) {
+    const pos = env.embers.geometry.attributes.position.array;
+    for (let i = 0; i < 200; i++) {
+      pos[i * 3 + 1] += delta * 1.5;
+      pos[i * 3] += Math.sin(time + i) * 0.02;
+      if (pos[i * 3 + 1] > 10) pos[i * 3 + 1] = 0;
+    }
+    env.embers.geometry.attributes.position.needsUpdate = true;
+  }
+
+  // Update Smoke (Subtle rotation)
+  if (env.smokeParticles) {
+    env.smokeParticles.children.forEach((s, i) => {
+      s.rotation.z += delta * 0.1 * (i % 2 === 0 ? 1 : -1);
+      s.position.x += Math.sin(time * 0.2 + i) * 0.005;
+    });
+  }
+
+  // Update Rot Spores (Drift down/sway)
+  if (env.spores) {
+    const pos = env.spores.geometry.attributes.position.array;
+    for (let i = 0; i < 500; i++) {
+      pos[i * 3 + 1] -= env.sporeSpeeds[i] * delta * 5.0; // Faster drift
+      pos[i * 3] += Math.sin(time * 0.5 + i) * 0.01;
+      if (pos[i * 3 + 1] < 0) pos[i * 3 + 1] = 20;
+    }
+    env.spores.geometry.attributes.position.needsUpdate = true;
+  }
 }

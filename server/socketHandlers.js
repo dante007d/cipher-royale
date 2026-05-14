@@ -13,11 +13,17 @@ export function registerSocketHandlers(io) {
 
     // ── CREATE ROOM ───────────────────────────────
     socket.on('create_room', ({ settings }) => {
-      const code = roomRegistry.generateRoomCode();
-      const room = new GameRoom(code, settings || {});
-      roomRegistry.rooms.set(code, room);
-      console.log(`[Room] Created: ${code}`);
-      socket.emit('room_created', { roomCode: code });
+      console.log(`[Room] Create request from socket: ${socket.id}`);
+      try {
+        const code = roomRegistry.generateRoomCode();
+        const room = new GameRoom(code, settings || {});
+        roomRegistry.rooms.set(code, room);
+        console.log(`[Room] Created: ${code} (Duration: ${room.settings.durationSeconds}s)`);
+        socket.emit('room_created', { roomCode: code });
+      } catch (err) {
+        console.error(`[Room] Create FAILED:`, err);
+        socket.emit('error', { message: 'Failed to create room' });
+      }
     });
 
     // ── JOIN ROOM ─────────────────────────────────

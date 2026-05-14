@@ -28,6 +28,10 @@ export class StateReconciler {
       let sprite = this.troopPool.getById(st.id);
       if (!sprite) {
         sprite = this.troopPool.spawn({ ...st, x: sx, y: sy });
+        // Deployment Effect
+        const deployPos = new THREE.Vector3(sx, 0, sy);
+        const color = st.owner === 'playerA' ? 0x00ffff : 0xff00ff;
+        this.particles.emitDeployment(deployPos, color);
       } else {
         sprite.targetX = sx;
         sprite.targetZ = sy;

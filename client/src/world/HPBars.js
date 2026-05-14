@@ -33,9 +33,21 @@ export function createTowerHPBar(towerGroup) {
 
 export function updateHPBar(towerGroup, hp, maxHp) {
   const fill  = towerGroup.userData.hpBarFill;
-  if (!fill) return;
+  const label = towerGroup.userData.hpBarLabel;
+  if (!fill || !label) return;
+
+  const prevRatio = parseFloat(fill.style.width) / 100 || 1.0;
   const ratio = Math.max(0, hp / maxHp);
   fill.style.width = `${ratio * 100}%`;
+
+  // Visual Feedback for Damage
+  if (ratio < prevRatio) {
+    label.element.style.animation = 'none';
+    void label.element.offsetWidth; // trigger reflow
+    label.element.style.animation = 'hpShake 0.3s cubic-bezier(.36,.07,.19,.97) both';
+    fill.style.filter = 'brightness(2.5)';
+    setTimeout(() => { fill.style.filter = 'none'; }, 100);
+  }
 
   if      (ratio > 0.6) fill.style.background = '#2ECC71';
   else if (ratio > 0.4) fill.style.background = '#F1C40F';
@@ -43,6 +55,6 @@ export function updateHPBar(towerGroup, hp, maxHp) {
   else                  fill.style.background = '#E74C3C';
   
   if (ratio <= 0) {
-    towerGroup.userData.hpBarLabel.visible = false;
+    label.visible = false;
   }
 }

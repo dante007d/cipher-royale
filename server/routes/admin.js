@@ -17,6 +17,7 @@ export default function adminRoutes(io) {
 
   // List all rooms
   router.get('/rooms', auth, (req, res) => {
+    console.log(`[Admin] Fetching all rooms...`);
     const rooms = roomRegistry.getAll().map(r => ({
       code: r.code,
       state: r.state,
@@ -24,6 +25,7 @@ export default function adminRoutes(io) {
       timeRemaining: r.timeRemaining,
       createdAt: r.createdAt,
     }));
+    console.log(`[Admin] Found ${rooms.length} rooms.`);
     res.json({ rooms });
   });
 

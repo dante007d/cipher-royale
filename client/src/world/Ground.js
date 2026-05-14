@@ -2,14 +2,14 @@ import * as THREE from 'three';
 
 export function createGround(scene) {
 
-  // ── MAIN GRASS GROUND (Playing Arena) ─────────────────────────────────────────
+  // ── MAIN MUDDY BATTLEFIELD (Playing Arena) ──────────────────────────────────
   const groundMaterial = new THREE.ShaderMaterial({
     uniforms: {
       time:         { value: 0 },
-      colorA:       { value: new THREE.Color(0x3e7a36) }, // Bright grass
-      colorB:       { value: new THREE.Color(0x4a9141) }, // Brighter grass
-      tileSize:     { value: 1.0 },
-      gridStrength: { value: 0.15 }
+      colorA:       { value: new THREE.Color(0x1a1a1a) }, // Deep mud
+      colorB:       { value: new THREE.Color(0x3a2f26) }, // Wet dirt
+      puddleColor:  { value: new THREE.Color(0x4a5a6a) }, // Sky reflection
+      gridStrength: { value: 0.1 }
     },
     vertexShader: `
       varying vec2 vUv;
@@ -24,7 +24,7 @@ export function createGround(scene) {
       uniform float time;
       uniform vec3 colorA;
       uniform vec3 colorB;
-      uniform float tileSize;
+      uniform vec3 puddleColor;
       uniform float gridStrength;
       varying vec2 vUv;
       varying vec3 vWorldPos;
@@ -33,15 +33,45 @@ export function createGround(scene) {
         return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
       }
 
-      void main() {
-        vec2 tileCoord = floor(vWorldPos.xz / tileSize);
-        float tileNoise = hash(tileCoord);
-        vec3 col = mix(colorA, colorB, tileNoise * 0.5 + 0.25);
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      }
 
-        vec2 frac = fract(vWorldPos.xz / tileSize);
-        float edge = min(frac.x, min(1.0 - frac.x, min(frac.y, 1.0 - frac.y)));
-        float grid = smoothstep(0.0, 0.04, edge);
-        col = mix(col * 0.85, col, grid);
+      void main() {
+        // Diseased, cracked earth
+        float n = noise(vWorldPos.xz * 1.8);
+        n += 0.4 * noise(vWorldPos.xz * 4.0);
+        
+        vec3 earth = mix(vec3(0.2, 0.05, 0.05), vec3(0.4, 0.15, 0.1), n);
+
+        // Scarlet Rot Pools (Glowing)
+        float rotNoise = noise(vWorldPos.xz * 0.7 + time * 0.03);
+        float rotMask = smoothstep(0.55, 0.65, rotNoise);
+        
+        // Sickly pink-red glow
+        vec3 rotCol = vec3(1.0, 0.1, 0.4) * (0.8 + 0.2 * sin(time * 2.0));
+        vec3 col = mix(earth, rotCol * 0.3, rotMask);
+        
+        // Creeping Veins (Corruption)
+        float vein = noise(vWorldPos.xz * 12.0);
+        float veinMask = smoothstep(0.7, 0.8, vein) * (1.0 - rotMask);
+        col = mix(col, vec3(0.1, 0.0, 0.0), veinMask);
+
+        // Subtle tactical grid (Aged and broken)
+        vec2 grid = abs(fract(vWorldPos.xz * 1.0 - 0.5) - 0.5);
+        float line = smoothstep(0.01, 0.0, min(grid.x, grid.y));
+        col += vec3(1.0, 0.4, 0.4) * line * gridStrength;
+
+        // Edge decay (Heavy shadow)
+        float dist = length(vUv - 0.5);
+        col *= smoothstep(0.95, 0.2, dist);
 
         gl_FragColor = vec4(col, 1.0);
       }

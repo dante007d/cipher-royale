@@ -39,7 +39,7 @@ export default function HUD() {
       <div className="hud-timer">{timerStr}</div>
       <div className="hud-player-info">
         <span className="hud-player-name" style={{ color: '#60a5fa' }}>{playerAName}</span>
-        <span className="hud-tokens">🪙 {tokens}</span>
+        <span className="hud-tokens" key={tokens}>🪙 {tokens}</span>
       </div>
     </div>
   );

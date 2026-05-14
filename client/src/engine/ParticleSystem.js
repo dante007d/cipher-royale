@@ -10,40 +10,6 @@ export class ParticleSystem {
     // Mote geometry (Death particles)
     this.moteGeo = new THREE.SphereGeometry(0.1, 4, 4);
 
-    // ── IMPROVED RAIN SYSTEM ──────────────────────────────────────
-    this.rainCount = 3500; // Increased count
-    this.rainPositions = new Float32Array(this.rainCount * 2 * 3);
-    const rainGeo = new THREE.BufferGeometry();
-    
-    // Wind tilt vector
-    this.wind = new THREE.Vector3(0.5, 0, 0.2); 
-    
-    for (let i = 0; i < this.rainCount; i++) {
-      const x = (Math.random() - 0.5) * 120;
-      const z = (Math.random() - 0.5) * 120;
-      const y = Math.random() * 40;
-      const len = 0.6 + Math.random() * 1.2;
-      
-      this.rainPositions[i*6]   = x;
-      this.rainPositions[i*6+1] = y;
-      this.rainPositions[i*6+2] = z;
-      
-      // End point with tilt
-      this.rainPositions[i*6+3] = x - this.wind.x * len * 0.2;
-      this.rainPositions[i*6+4] = y - len;
-      this.rainPositions[i*6+5] = z - this.wind.z * len * 0.2;
-    }
-    
-    rainGeo.setAttribute('position', new THREE.BufferAttribute(this.rainPositions, 3));
-    const rainMat = new THREE.LineBasicMaterial({ 
-      color: 0x99aabb, 
-      transparent: true, 
-      opacity: 0.25,
-      blending: THREE.AdditiveBlending 
-    });
-    this.rainLines = new THREE.LineSegments(rainGeo, rainMat);
-    this.scene.add(this.rainLines);
-
     // RIPPLES
     this.ripples = [];
     this.rippleGeo = new THREE.RingGeometry(0.1, 0.12, 24);
@@ -72,25 +38,117 @@ export class ParticleSystem {
   }
 
   emitClash(pos) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 64; canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(32, 32, 20, 0, Math.PI * 2);
-    ctx.fill();
-    
-    const mat = new THREE.SpriteMaterial({ 
-      map: new THREE.CanvasTexture(canvas),
+    // 1. Central Spark Flash
+    const sparkMat = new THREE.SpriteMaterial({ 
+      map: this.createGlowTexture('#ffffff'),
       transparent: true,
       blending: THREE.AdditiveBlending
     });
-    const spark = new THREE.Sprite(mat);
+    const spark = new THREE.Sprite(sparkMat);
     spark.position.copy(pos);
-    spark.scale.setScalar(0.8);
-    spark.userData = { life: 0.4 };
+    spark.scale.setScalar(1.5);
+    spark.userData = { life: 0.3 };
     this.scene.add(spark);
     this.clashes.push(spark);
+
+    // 2. Flying Bits
+    for (let i = 0; i < 5; i++) {
+      const bit = new THREE.Mesh(
+        new THREE.BoxGeometry(0.05, 0.05, 0.05),
+        new THREE.MeshBasicMaterial({ color: 0xffaa00 })
+      );
+      bit.position.copy(pos);
+      bit.userData = {
+        vel: new THREE.Vector3((Math.random()-0.5)*5, Math.random()*5, (Math.random()-0.5)*5),
+        life: 0.5
+      };
+      this.scene.add(bit);
+      this.motes.push(bit);
+    }
+  }
+
+  emitDeployment(pos, color = 0xff0000) {
+    // 1. Ground Shockwave
+    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.8, side: THREE.DoubleSide });
+    const ripple = new THREE.Mesh(this.rippleGeo, mat);
+    ripple.position.copy(pos).setY(0.05);
+    ripple.userData = { life: 1.0, scaleSpeed: 15 };
+    this.scene.add(ripple);
+    this.ripples.push(ripple);
+
+    // 2. JAGGERY LIGHTNING BOLT
+    const boltPoints = [];
+    let cur = new THREE.Vector3(pos.x, 20, pos.z);
+    for(let i=0; i<10; i++) {
+      boltPoints.push(cur.clone());
+      cur.y -= 2;
+      cur.x += (Math.random()-0.5)*2;
+      cur.z += (Math.random()-0.5)*2;
+    }
+    boltPoints.push(pos.clone());
+    const boltGeo = new THREE.BufferGeometry().setFromPoints(boltPoints);
+    const boltMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2, transparent: true, blending: THREE.AdditiveBlending });
+    const bolt = new THREE.Line(boltGeo, boltMat);
+    bolt.userData = { life: 0.2 };
+    this.scene.add(bolt);
+    this.clashes.push(bolt); // Clean up via clashes array
+
+    // 3. Screen Shake trigger
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 1.5, duration: 400 } }));
+  }
+
+  emitAmbientLightning() {
+    // Pick position ANYWHERE (including arena)
+    const x = (Math.random() - 0.5) * 60;
+    const z = (Math.random() - 0.5) * 80;
+    
+    const pos = new THREE.Vector3(x, 0, z);
+
+    // 1. BOLT
+    const boltPoints = [];
+    let cur = new THREE.Vector3(pos.x, 30, pos.z);
+    for(let i=0; i<15; i++) {
+      boltPoints.push(cur.clone());
+      cur.y -= 2;
+      cur.x += (Math.random()-0.5)*3;
+      cur.z += (Math.random()-0.5)*3;
+    }
+    boltPoints.push(pos.clone());
+    const boltGeo = new THREE.BufferGeometry().setFromPoints(boltPoints);
+    const boltMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 3, transparent: true, blending: THREE.AdditiveBlending });
+    const bolt = new THREE.Line(boltGeo, boltMat);
+    bolt.userData = { life: 0.15 }; // Quick flash
+    this.scene.add(bolt);
+    this.clashes.push(bolt);
+
+    // 2. Ground Impact Sprite
+    const impactMat = new THREE.SpriteMaterial({ 
+      map: this.createGlowTexture('#ffffff'), 
+      transparent: true, 
+      blending: THREE.AdditiveBlending 
+    });
+    const impact = new THREE.Sprite(impactMat);
+    impact.position.copy(pos).setY(0.5);
+    impact.scale.setScalar(12); // Increased from 8
+    impact.userData = { life: 0.25 };
+    this.scene.add(impact);
+    this.clashes.push(impact);
+
+    // 3. GLOBAL EFFECTS
+    window.dispatchEvent(new CustomEvent('lightning_strike', { detail: { intensity: 4.0 } }));
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 2.5, duration: 300 } }));
+  }
+
+  createGlowTexture(colorStr) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, colorStr);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(canvas);
   }
 
   emitTowerDestruction(pos) {
@@ -203,44 +261,10 @@ export class ParticleSystem {
     for (let i = this.ripples.length - 1; i >= 0; i--) {
       const r = this.ripples[i];
       r.userData.life -= delta * 1.5;
-      r.scale.setScalar(1 + (1 - r.userData.life) * 4);
+      const s = r.userData.scaleSpeed || 4;
+      r.scale.setScalar(1 + (1 - r.userData.life) * s);
       r.material.opacity = r.userData.life;
       if (r.userData.life <= 0) { this.scene.remove(r); this.ripples.splice(i, 1); }
     }
-
-    // ── IMPROVED RAIN UPDATE ──
-    const pos = this.rainLines.geometry.attributes.position.array;
-    for (let i = 0; i < this.rainCount; i++) {
-      // Dynamic speed based on index for variation
-      const speed = 25 + (i % 10) * 2 + Math.random() * 5;
-      
-      const dx = this.wind.x * speed * delta;
-      const dy = speed * delta;
-      const dz = this.wind.z * speed * delta;
-
-      pos[i*6]   -= dx;
-      pos[i*6+1] -= dy;
-      pos[i*6+2] -= dz;
-      pos[i*6+3] -= dx;
-      pos[i*6+4] -= dy;
-      pos[i*6+5] -= dz;
-      
-      if (pos[i*6+1] < 0) {
-        const x = (Math.random() - 0.5) * 120;
-        const z = (Math.random() - 0.5) * 120;
-        const y = 30 + Math.random() * 10;
-        const len = 0.6 + Math.random() * 1.2;
-        
-        pos[i*6]   = x; pos[i*6+1] = y; pos[i*6+2] = z;
-        pos[i*6+3] = x - this.wind.x * len * 0.2; 
-        pos[i*6+4] = y - len; 
-        pos[i*6+5] = z - this.wind.z * len * 0.2;
-
-        if (Math.random() > 0.98 && Math.abs(x) < 10 && Math.abs(z) < 20) {
-          this.emitRipple(new THREE.Vector3(x, 0, z));
-        }
-      }
-    }
-    this.rainLines.geometry.attributes.position.needsUpdate = true;
   }
 }

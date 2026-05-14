@@ -39,9 +39,14 @@ export default function AdminPanel() {
       if (res.ok) {
         const data = await res.json();
         setRooms(data.rooms || []);
+        if (statusMsg.includes('Unauthorized') || statusMsg.includes('failed')) setStatusMsg('');
+      } else {
+        if (res.status === 401) setStatusMsg('Unauthorized: Invalid Secret');
+        else setStatusMsg(`Fetch error: ${res.status}`);
       }
     } catch (e) {
-      // API may not exist yet, use socket fallback
+      console.error('[Admin] Fetch error:', e);
+      setStatusMsg('Server connection failed. Check console.');
     }
   };
 

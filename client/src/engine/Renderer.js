@@ -16,7 +16,7 @@ export function createRenderer(canvas) {
   renderer.shadowMap.enabled  = true;
   renderer.shadowMap.type     = THREE.PCFShadowMap; // Fixed deprecated warning
   renderer.toneMapping        = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.5;
+  renderer.toneMappingExposure = 2.2; // Increased for high contrast
   renderer.outputColorSpace   = THREE.SRGBColorSpace;
   return renderer;
 }
@@ -37,12 +37,12 @@ export function createComposer(renderer, scene, camera) {
   // Base render pass
   composer.addPass(new RenderPass(scene, camera));
 
-  // Bloom — glowing HP bars, magic, explosions
+  // Bloom — high intensity for war highlights
   const bloom = new UnrealBloomPass(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
-    0.4,   // strength (slightly reduced)
-    0.4,   // radius
-    0.85   // threshold
+    0.8,   // strength (increased)
+    0.5,   // radius
+    0.7    // threshold (lower to catch more highlights)
   );
   composer.addPass(bloom);
 

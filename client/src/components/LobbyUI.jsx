@@ -11,35 +11,14 @@ export default function LobbyUI() {
   const [roomInfo, setRoomInfo] = useState(null);
   const navigate = useNavigate();
   const countdownRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     SocketService.connect();
 
-    SocketService.on('join_result', (data) => {
-      if (data.success) {
-        setStatus('waiting');
-        setStatusMsg('Waiting for opponent...');
-        setRoomInfo({
-          roomCode: data.roomCode,
-          playerIndex: data.playerIndex,
-          playerName: playerName,
-        });
-        // Store in window for GameScene access
-        const role = data.playerIndex === 0 ? 'playerA' : 'playerB';
-        const roomData = {
-          roomCode: data.roomCode,
-          playerIndex: data.playerIndex,
-          playerRole: role,
-          playerName: playerName,
-        };
-        window.__cipherClash = roomData;
-        localStorage.setItem('cipherClash_room', JSON.stringify(roomData));
-      } else {
-        setStatus('error');
-        setStatusMsg(data.error || 'Failed to join');
-      }
-    });
-
+    // REMOVED: Redundant join_result listener here, now handled in the main listener set
+    // to ensure timeout clearing.
+    
     SocketService.on('room_ready', (data) => {
       setStatus('ready');
       setStatusMsg(`${data.playerA} vs ${data.playerB}`);
@@ -66,9 +45,49 @@ export default function LobbyUI() {
       }, 1000);
     });
 
+    SocketService.on('room_created', (data) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setStatus('waiting');
+      setStatusMsg('Room created! Waiting for opponent...');
+      setRoomCode(data.roomCode);
+      setRoomInfo(prev => ({ ...prev, roomCode: data.roomCode }));
+      
+      const cleanName = playerName.trim().slice(0, 16).replace(/[^a-zA-Z0-9_]/g, '');
+      SocketService.emit('join_room', {
+        roomCode: data.roomCode,
+        playerName: cleanName,
+      });
+    });
+
+    SocketService.on('join_result', (data) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (data.success) {
+        setStatus('waiting');
+        setStatusMsg('Waiting for opponent...');
+        setRoomInfo({
+          roomCode: data.roomCode,
+          playerIndex: data.playerIndex,
+          playerName: playerName,
+        });
+        const role = data.playerIndex === 0 ? 'playerA' : 'playerB';
+        const roomData = {
+          roomCode: data.roomCode,
+          playerIndex: data.playerIndex,
+          playerRole: role,
+          playerName: playerName,
+        };
+        window.__cipherClash = roomData;
+        localStorage.setItem('cipherClash_room', JSON.stringify(roomData));
+      } else {
+        setStatus('error');
+        setStatusMsg(data.error || 'Failed to join');
+      }
+    });
+
     return () => {
       SocketService.off('join_result');
       SocketService.off('room_ready');
+      SocketService.off('room_created');
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
   }, [playerName]);
@@ -79,6 +98,14 @@ export default function LobbyUI() {
     const cleanCode = roomCode.trim().toUpperCase().slice(0, 6);
     setStatus('joining');
     setStatusMsg('Connecting...');
+
+    timeoutRef.current = setTimeout(() => {
+      if (status === 'joining') {
+        setStatus('error');
+        setStatusMsg('Join timeout. Check room code.');
+      }
+    }, 8000);
+
     SocketService.emit('join_room', {
       roomCode: cleanCode,
       playerName: cleanName,
@@ -87,19 +114,16 @@ export default function LobbyUI() {
 
   const handleCreate = () => {
     if (!playerName.trim()) return;
-    const cleanName = playerName.trim().slice(0, 16).replace(/[^a-zA-Z0-9_]/g, '');
     setStatus('joining');
     setStatusMsg('Creating room...');
 
-    SocketService.on('room_created', (data) => {
-      setRoomCode(data.roomCode);
-      SocketService.off('room_created');
-      // Auto-join the created room
-      SocketService.emit('join_room', {
-        roomCode: data.roomCode,
-        playerName: cleanName,
-      });
-    });
+    // Timeout if server doesn't respond
+    timeoutRef.current = setTimeout(() => {
+      if (status === 'joining') {
+        setStatus('error');
+        setStatusMsg('Server timeout. Try again.');
+      }
+    }, 8000);
 
     SocketService.emit('create_room', {
       settings: { durationSeconds: 300 },
@@ -154,17 +178,17 @@ export default function LobbyUI() {
           <button
             className="btn-primary"
             onClick={handleJoin}
-            disabled={!playerName.trim() || !roomCode.trim() || status === 'waiting' || status === 'ready'}
+            disabled={!playerName.trim() || !roomCode.trim() || status === 'joining' || status === 'waiting' || status === 'ready'}
           >
-            Join Room
+            {status === 'joining' ? '...' : 'Join Room'}
           </button>
           <button
             className="btn-primary"
             onClick={handleCreate}
-            disabled={!playerName.trim() || status === 'waiting' || status === 'ready'}
+            disabled={!playerName.trim() || status === 'joining' || status === 'waiting' || status === 'ready'}
             style={{ background: 'linear-gradient(135deg, #8b5cf6, #a855f7)' }}
           >
-            Create Room
+            {status === 'joining' ? '...' : 'Create Room'}
           </button>
         </div>
 

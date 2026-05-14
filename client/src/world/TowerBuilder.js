@@ -51,13 +51,32 @@ export function buildTowerMesh(type, playerSide, scene) {
     group.add(batt);
   });
 
-  // Flag
+  // CORRUPTED CAELID SPIKES
+  const spikeGeo = new THREE.ConeGeometry(0.15, 0.8, 4);
+  const spikeMat = new THREE.MeshStandardMaterial({ color: 0x330000, roughness: 1.0 });
+  for (let i = 0; i < 4; i++) {
+    const spike = new THREE.Mesh(spikeGeo, spikeMat);
+    const angle = (i / 4) * Math.PI * 2;
+    spike.position.set(Math.cos(angle) * s.baseW/2, 1.5, Math.sin(angle) * s.baseD/2);
+    spike.rotation.x = Math.PI / 2;
+    spike.rotation.z = angle;
+    group.add(spike);
+  }
+
+  // GLOWING ROT VEIN
+  const veinMat = new THREE.MeshBasicMaterial({ color: 0xff0066, transparent: true, opacity: 0.8 });
+  const vein = new THREE.Mesh(new THREE.PlaneGeometry(0.2, s.bodyH), veinMat);
+  vein.position.set(0, 0.25 + s.bodyH/2, s.baseD/2 + 0.01);
+  group.add(vein);
+
+  // Flag (Tattered)
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.2, 6), stoneDarkMat);
   pole.position.y = 0.25 + s.bodyH + 0.6;
   group.add(pole);
   const flagMat = new THREE.MeshStandardMaterial({ color: playerBright, emissive: playerBright, emissiveIntensity: 0.4, side: THREE.DoubleSide });
-  const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.3), flagMat);
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.4), flagMat);
   flag.position.set(0.25, 0.25 + s.bodyH + 1.1, 0);
+  flag.rotation.z = 0.2;
   group.add(flag);
 
   // Rubble group (hidden by default)

@@ -43,14 +43,19 @@ export class GameLoop {
     const delta = (time - this.lastTime) / 1000;
     this.lastTime = time;
 
-    // 0. Update environment animations (clouds)
-    if (this.systems.environment) updateEnvironment(this.systems.environment, delta);
+    // 0. Update environment animations (clouds + cipher particles)
+    if (this.systems.environment) updateEnvironment(this.systems.environment, delta, time / 1000);
 
     // 1. Update troop animations
     if (this.systems.troopPool) this.systems.troopPool.updateAll(delta);
 
     // 1.5. Update particle systems (rain, ripples, splashes)
     if (this.systems.particles) this.systems.particles.update(delta);
+
+    // --- RANDOM AMBIENT LIGHTNING ---
+    if (Math.random() > 0.985) { // More frequent strikes
+      this.systems.particles.emitAmbientLightning();
+    }
 
     // 2. Flicker torch lights & lightning
     if (this.systems.lighting) updateTorchFlicker(this.systems.lighting, time / 1000);
@@ -69,17 +74,21 @@ export class GameLoop {
       });
     }
 
-    // 5. Camera shake
+    // 5. Cinematic Camera: Handheld & Impact Shake
+    let shakeX = 0, shakeY = 0;
     if (this.cameraShake.active) {
       this.cameraShake.remaining -= delta * 1000;
-      const s = this.cameraShake.intensity;
-      this.camera.position.x += (Math.random() - 0.5) * s;
-      this.camera.position.y += (Math.random() - 0.5) * s * 0.5;
-      if (this.cameraShake.remaining <= 0) {
-        this.cameraShake.active = false;
-        // Re-center camera could be added here
-      }
+      shakeX = (Math.random() - 0.5) * this.cameraShake.intensity;
+      shakeY = (Math.random() - 0.5) * this.cameraShake.intensity * 0.5;
+      if (this.cameraShake.remaining <= 0) this.cameraShake.active = false;
     }
+
+    // Subtle constant handheld breathing (Perlin-like)
+    const breatheX = Math.sin(time * 0.0012) * 0.05;
+    const breatheY = Math.cos(time * 0.0008) * 0.03;
+    
+    this.camera.position.x += shakeX + breatheX;
+    this.camera.position.y += shakeY + breatheY;
 
     // 6. Danger pulse (vignette shader uniform)
     if (this.systems.vignettePass) {

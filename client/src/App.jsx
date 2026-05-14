@@ -6,7 +6,7 @@ import AdminPanel from './components/AdminPanel.jsx';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={<LobbyUI />} />
         <Route path="/game" element={<GameContainer />} />

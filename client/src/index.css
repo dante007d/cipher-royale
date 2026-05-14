@@ -63,21 +63,62 @@ input {
   justify-content: center;
   min-height: 100vh;
   padding: 2rem;
-  background: radial-gradient(ellipse at center, #111827 0%, #0a0e17 70%);
+  background: radial-gradient(circle at center, #1a1f2e 0%, #0a0e17 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.lobby-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lobby-container::after {
+  content: '';
+  position: absolute;
+  top: -100%; left: 0; right: 0; bottom: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(6, 182, 212, 0.05), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes scanline {
+  0% { top: -100%; bottom: 100%; }
+  100% { top: 100%; bottom: -100%; }
 }
 
 .lobby-title {
   font-family: var(--font-display);
-  font-size: 3.5rem;
+  font-size: 4rem;
   font-weight: 900;
   letter-spacing: 0.15em;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-cyan));
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 0.5rem;
-  text-shadow: none;
-  filter: drop-shadow(0 0 30px rgba(6,182,212,0.3));
+  filter: drop-shadow(0 0 15px rgba(6,182,212,0.4));
+  animation: shine 4s linear infinite, glitchText 6s infinite;
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
+}
+
+@keyframes glitchText {
+  0%, 95%, 100% { transform: none; filter: none; }
+  96% { transform: skewX(-15deg); filter: hue-rotate(90deg); }
+  97% { transform: skewX(15deg); filter: hue-rotate(-90deg); }
+  98% { transform: skewX(-5deg); opacity: 0.8; }
 }
 
 .lobby-subtitle {
@@ -89,14 +130,31 @@ input {
 }
 
 .lobby-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: rgba(26, 31, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 2.5rem;
   width: 420px;
   max-width: 90vw;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4), var(--glow-cyan);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.lobby-card::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: conic-gradient(transparent, rgba(6, 182, 212, 0.1), transparent 30%);
+  animation: rotate 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .lobby-card h2 {
@@ -147,17 +205,28 @@ input {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(6,182,212,0.4);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+  box-shadow: 0 0 20px rgba(6,182,212,0.6);
+  filter: brightness(1.1);
 }
 
 .lobby-status {
@@ -251,6 +320,7 @@ input {
   font-family: var(--font-display);
   font-size: 0.9rem;
   color: var(--accent-gold);
+  animation: tokenPop 0.4s ease-out;
 }
 
 .hud-timer {
@@ -655,6 +725,13 @@ input {
 }
 
 .token-pop { animation: tokenPop 0.4s ease-out; }
+
+@keyframes hpShake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
 /* ── Responsive Refinements ────────── */
 @media (max-width: 1280px) {
   .game-wrapper {
