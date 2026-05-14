@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 export function createGround(scene) {
 
@@ -97,6 +98,13 @@ export function createGround(scene) {
   dirt.receiveShadow = true;
   scene.add(dirt);
 
+  // ── SOLID BASE (Earth thickness to hide "underground") ────────────────────────
+  const baseGeo = new THREE.BoxGeometry(250, 5, 250);
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0x1a1510 }); // Darker than top soil
+  const base = new THREE.Mesh(baseGeo, baseMat);
+  base.position.set(0, -2.65, 0); // Position so top matches dirt plane
+  scene.add(base);
+
   // ── THREE LANE STRIPS (Stone path) ────────────────────────────
   const laneMaterial = new THREE.MeshStandardMaterial({
     color:     0x3d3021, // Wet muddy stone
@@ -139,21 +147,44 @@ export function createGround(scene) {
   scene.add(centerLine);
 
   // ── LANE CLICK ZONES (Both Sides) ────────────
-  const clickZoneGeo = new THREE.PlaneGeometry(2.5, 20); // Increased width and height
-  const clickZoneMat = new THREE.MeshBasicMaterial({ color: 0xe0f7fa, transparent: true, opacity: 0, visible: false });
+  const clickZoneGeo = new THREE.PlaneGeometry(3.5, 20); // Narrower (3.5) for precise clicking + gaps
+  const clickZoneMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0, visible: false });
   const clickZones = [];
 
   ['playerA', 'playerB'].forEach(side => {
-    const sideZ = side === 'playerA' ? 10.0 : -10.0;
+    const isA = side === 'playerA';
+    const sideZ = isA ? 10.0 : -10.0;
+    
     lanePositions.forEach((x, i) => {
       const zone = new THREE.Mesh(clickZoneGeo, clickZoneMat.clone());
       zone.rotation.x = -Math.PI / 2;
       zone.position.set(x, 0.1, sideZ); 
       
-      // Lane names should match world X positions consistently
-      const lane = ['left', 'center', 'right'][i];
+      const laneName = ['left', 'center', 'right'][i];
       
-      zone.userData.lane = lane;
+      // PERMANENT LANE LABEL (CSS2D) - Optimised for Low-end
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'lane-indicator';
+      labelDiv.innerHTML = `<div style="font-size: 10px; opacity: 0.5;">LANE</div>${laneName.toUpperCase()}`;
+      labelDiv.style.cssText = `
+        color: ${isA ? '#ff4d4d' : '#4d94ff'}; 
+        font-family: 'Outfit', sans-serif; 
+        font-weight: 900;
+        font-size: 20px; 
+        text-align: center;
+        letter-spacing: 2px;
+        text-shadow: 0 0 15px rgba(0,0,0,0.8);
+        padding: 5px 10px;
+        border-top: 2px solid currentColor;
+        pointer-events: none;
+        user-select: none;
+      `;
+      const label = new CSS2DObject(labelDiv);
+      // Position label near the player's side of the lane
+      label.position.set(0, 0, isA ? 6 : -6);
+      zone.add(label);
+
+      zone.userData.lane = laneName;
       zone.userData.side = side;
       zone.userData.isLaneZone = true;
       scene.add(zone);

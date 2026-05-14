@@ -55,6 +55,9 @@ export class TroopPool {
   }
 
   updateAll(delta) {
-    this.pool.forEach(s => s.update(delta));
+    // OPTIMISATION: Only update active mesh groups
+    for (let i = 0; i < this.pool.length; i++) {
+      if (this.pool[i].alive) this.pool[i].update(delta);
+    }
   }
 }

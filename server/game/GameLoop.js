@@ -11,8 +11,12 @@ export function startGameLoop(room, io) {
   const TICK_MS = GAME_CONFIG.TICK_RATE_MS;
 
   room.tickInterval = setInterval(() => {
-    if (room.state !== 'ACTIVE') return;
-    tick(room, TICK_MS, io);
+    try {
+      if (room.state !== 'ACTIVE') return;
+      tick(room, TICK_MS, io);
+    } catch (err) {
+      console.error(`[CRITICAL ERROR] GameLoop Room:${room.code}`, err);
+    }
   }, TICK_MS);
 
   console.log(`[GameLoop] Started for room ${room.code} @ ${1000 / TICK_MS} TPS`);
@@ -62,24 +66,32 @@ function tick(room, deltaMs, io) {
 
   // ── 4. DETECT COLLISIONS & RESOLVE COMBAT ────
   const alive = room.troopGroups.filter(g => g.alive);
-  for (let i = 0; i < alive.length; i++) {
-    for (let j = i + 1; j < alive.length; j++) {
-      if (checkCollision(alive[i], alive[j])) {
-        // WAR ENGINE EXCEPTION: Engines do not stop for troops
-        const hasEngine = alive[i].type === 'warEngine' || alive[j].type === 'warEngine';
-        
-        if (!hasEngine) {
-          alive[i].inCombat = true;
-          alive[j].inCombat = true;
-        }
+  const lanes = { left: [], center: [], right: [] };
+  alive.forEach(g => lanes[g.lane]?.push(g));
 
-        resolveCombat(alive[i], alive[j], delta);
-        combatEvents.push({
-          type: 'clash',
-          x: (alive[i].x + alive[j].x) / 2,
-          y: (alive[i].y + alive[j].y) / 2,
-          data: {},
-        });
+  for (const laneName in lanes) {
+    const laneUnits = lanes[laneName];
+    for (let i = 0; i < laneUnits.length; i++) {
+      for (let j = i + 1; j < laneUnits.length; j++) {
+        const a = laneUnits[i];
+        const b = laneUnits[j];
+        if (checkCollision(a, b)) {
+          // WAR ENGINE EXCEPTION: Engines do not stop for troops
+          const hasEngine = a.type === 'warEngine' || b.type === 'warEngine';
+          
+          if (!hasEngine) {
+            a.inCombat = true;
+            b.inCombat = true;
+          }
+
+          resolveCombat(a, b, delta);
+          combatEvents.push({
+            type: 'clash',
+            x: (a.x + b.x) / 2,
+            y: (a.y + b.y) / 2,
+            data: {},
+          });
+        }
       }
     }
   }
@@ -95,25 +107,35 @@ function tick(room, deltaMs, io) {
     if (blocker) {
       group.attackingTowerId = blocker.id;
 
-      // Stopping distance — reduced so they actually "reach" the tower
       const standoff = 0.7; 
       const range = (group.atkRange || 0.5) + standoff;
       const dist = Math.abs(group.y - blocker.y);
 
-      if (dist <= range) {
+      // ── ATTACK LOGIC ───────────────────────────────────────────────
+      if (dist <= range + 0.5) { 
         resolveTroopTowerCombat(group, blocker, delta);
+        
         if (!blocker.alive) {
-          const enemyRole = room.getOpponentRole(group.owner);
           room.stats[group.owner].towersDestroyed++;
           combatEvents.push({ type: 'tower_fall', x: blocker.x, y: blocker.y, data: { towerId: blocker.id } });
           group.attackingTowerId = null;
-          group.alive = false; // Troops vanish upon destroying a tower
         } else {
           combatEvents.push({ type: 'tower_hit', x: blocker.x, y: blocker.y, data: {} });
         }
       }
     } else {
       group.attackingTowerId = null;
+      
+      // ── FORCE DAMAGE FALLBACK (If near the main tower base) ─────────
+      const enemyRole = room.getOpponentRole(group.owner);
+      const main = room.getMainTower(enemyRole);
+      if (main && main.alive) {
+        const distToMain = Math.abs(group.y - main.y);
+        if (distToMain < 2.0) {
+          console.log(`[FORCE-HIT] Troop ${group.id} forcing damage on ${main.id} (Dist: ${distToMain.toFixed(2)})`);
+          resolveTroopTowerCombat(group, main, delta);
+        }
+      }
     }
   }
 
@@ -176,6 +198,7 @@ function determineTowerCountWinner(room) {
 function endGame(room, winnerRole, reason, io) {
   stopGameLoop(room);
   room.state = 'ENDED';
+  room.winner = winnerRole;
 
   io.to(room.code).emit('game_over', {
     winner: winnerRole,
@@ -200,7 +223,7 @@ function botTick(room, deltaMs, io) {
 
     // 2. Deploy troops
     if (p.deployCooldown <= 0 && p.tokens >= 4) {
-      const cardTypes = ['infantry', 'guardian', 'titan'];
+      const cardTypes = ['low', 'mid', 'high'];
       const cardType = cardTypes[Math.floor(Math.random() * cardTypes.length)];
       const lanes = ['left', 'center', 'right'];
       const lane = lanes[Math.floor(Math.random() * lanes.length)];

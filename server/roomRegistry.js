@@ -3,6 +3,18 @@ const SAFE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 class RoomRegistry {
   constructor() {
     this.rooms = new Map();
+    
+    // AUTOMATIC CLEANUP: Every 15 minutes, remove rooms older than 4 hours
+    setInterval(() => {
+      const now = Date.now();
+      const expiry = 4 * 60 * 60 * 1000;
+      for (const [code, room] of this.rooms) {
+        if (now - room.createdAt > expiry || room.state === 'ENDED') {
+          console.log(`[Registry] Cleaning up room: ${code}`);
+          this.rooms.delete(code);
+        }
+      }
+    }, 15 * 60 * 1000);
   }
 
   generateRoomCode() {

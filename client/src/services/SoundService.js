@@ -209,29 +209,6 @@ class SoundService {
       setTimeout(playCaelidAmbience, 6000 + Math.random() * 10000);
     };
     playCaelidAmbience();
-
-    // 5. LIGHTNING STRIKE EVENT LISTENER
-    window.addEventListener('lightning_strike', () => {
-      if (!this.ambienceStarted) return;
-      
-      const osc = this.ctx.createOscillator();
-      const g = this.ctx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(40 + Math.random()*20, this.ctx.currentTime);
-      
-      g.gain.setValueAtTime(1.2, this.ctx.currentTime); // Increased from 0.6
-      g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 4.0); // Longer decay
-      
-      const lowPass = this.ctx.createBiquadFilter();
-      lowPass.type = 'lowpass';
-      lowPass.frequency.value = 500;
-
-      osc.connect(lowPass);
-      lowPass.connect(g);
-      g.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 3.0);
-    });
   }
 }
 

@@ -91,7 +91,9 @@ export function resolveCombat(attackerGroup, defenderGroup, deltaSeconds) {
 
 function applyDamageToGroup(group, totalDmg) {
   let remaining = totalDmg;
-  while (remaining > 0 && group.units.length > 0) {
+  let safety = 0;
+  while (remaining > 0 && group.units.length > 0 && safety < 100) {
+    safety++;
     const front = group.units[0];
     if (front.hp <= remaining) {
       remaining -= front.hp;
@@ -113,21 +115,32 @@ function applyDamageToGroup(group, totalDmg) {
 // ═══════════════════════════════════════════
 
 export function resolveTroopTowerCombat(troopGroup, tower, deltaSeconds) {
-  let dps = troopGroup.towerDPS * troopGroup.units.length;
+  if (!tower || !tower.alive) return;
 
-  if (troopGroup.config?.towerBonusDmg) {
-    dps *= troopGroup.config.towerBonusDmg;
+  // Ensure types are strictly numbers
+  let currentHp = Number(tower.hp);
+  const baseDps = Number(troopGroup.towerDPS || 15);
+  const unitCount = Number(troopGroup.units.length);
+  
+  const dps = Math.max(10, baseDps * unitCount); // Guaranteed minimum damage
+  const damage = dps * deltaSeconds;
+  
+  if (damage > 0) {
+    tower.hp = currentHp - damage;
+    
+    if (tower.type === 'main') {
+      // Logic only
+    }
   }
-
-  tower.hp -= dps * deltaSeconds;
 
   // Tower fires back
   if (troopGroup.units.length > 0) {
     const target = troopGroup.units[0];
-    target.hp -= tower.attackDPS * deltaSeconds;
+    const towerDps = Number(tower.attackDPS || 35);
+    target.hp = Number(target.hp) - (towerDps * deltaSeconds);
+    
     if (target.hp <= 0) {
       troopGroup.units.shift();
-      // BOMB SQUAD: Even on tower death
       if (troopGroup.type === 'bombSquad') {
         troopGroup._pendingExplosions = troopGroup._pendingExplosions || [];
         troopGroup._pendingExplosions.push({ x: troopGroup.x, y: troopGroup.y });
@@ -136,7 +149,9 @@ export function resolveTroopTowerCombat(troopGroup, tower, deltaSeconds) {
   }
 
   if (troopGroup.units.length === 0) troopGroup.alive = false;
+  
   if (tower.hp <= 0) {
+    console.log(`[VICTORY] Main Tower ${tower.id} Destroyed!`);
     tower.hp = 0;
     tower.alive = false;
   }
@@ -171,9 +186,9 @@ export function resolveBombExplosions(allGroups, combatEvents) {
 // ═══════════════════════════════════════════
 
 export function getBlockingTower(group, enemyTowers) {
-  const standoff = 0.4;
+  const standoff = 0.7; // Unify with GameLoop for consistent stopping/attacking
   const range = (group.atkRange || 0.5) + standoff;
-
+  
   // 1. Check Sub-Towers in this lane
   for (const tower of enemyTowers) {
     if (!tower.alive || tower.type === 'main') continue;
@@ -189,14 +204,9 @@ export function getBlockingTower(group, enemyTowers) {
   // 2. Check Main Tower
   const mainTower = enemyTowers.find(t => t.type === 'main');
   if (mainTower && mainTower.alive) {
-    // Only blocked if the SPECIFIC lane tower is still alive
-    const laneSubAlive = enemyTowers.some(t => t.alive && t.type !== 'main' && t.lane === group.lane);
-    
-    if (!laneSubAlive) {
-      const dist = Math.abs(group.y - mainTower.y);
-      const mainRange = range + 0.5; // Slightly larger range for main
-      if (dist <= mainRange) return mainTower;
-    }
+    const dist = Math.abs(group.y - mainTower.y);
+    // Be very generous with detection for main tower
+    if (dist <= range + 0.5) return mainTower;
   }
 
   return null;

@@ -149,6 +149,8 @@ export default function AdminPanel() {
                 <th>Code</th>
                 <th>Players</th>
                 <th>State</th>
+                <th>Winner</th>
+                <th>Duration</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -159,7 +161,15 @@ export default function AdminPanel() {
                     {room.code}
                   </td>
                   <td>{room.players?.join(' vs ') || '-'}</td>
-                  <td>{room.state}</td>
+                  <td>
+                    <span className={`state-tag ${room.state.toLowerCase()}`}>
+                      {room.state}
+                    </span>
+                  </td>
+                  <td style={{ color: room.winner ? 'var(--accent-green)' : 'inherit' }}>
+                    {room.winner ? (room.winner === 'playerA' ? room.players[0] : room.players[1] || 'Bot') : '-'}
+                  </td>
+                  <td>{room.duration}s</td>
                   <td>
                     {room.state === 'ACTIVE' && (
                       <button className="btn-admin pause" onClick={() => handlePause(room.code)}>Pause</button>

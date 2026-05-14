@@ -53,7 +53,7 @@ export class GameLoop {
     if (this.systems.particles) this.systems.particles.update(delta);
 
     // --- RANDOM AMBIENT LIGHTNING ---
-    if (Math.random() > 0.985) { // More frequent strikes
+    if (Math.random() > 0.995) { // Reduced frequency for performance
       this.systems.particles.emitAmbientLightning();
     }
 
@@ -87,8 +87,7 @@ export class GameLoop {
     const breatheX = Math.sin(time * 0.0012) * 0.05;
     const breatheY = Math.cos(time * 0.0008) * 0.03;
     
-    this.camera.position.x += shakeX + breatheX;
-    this.camera.position.y += shakeY + breatheY;
+    // Handled in the render section below to prevent drift
 
     // 6. Danger pulse (vignette shader uniform)
     if (this.systems.vignettePass) {
@@ -102,11 +101,21 @@ export class GameLoop {
     // 6.6. Update Lane Input (tactical pulse)
     if (this.systems.laneInput) this.systems.laneInput.update(time / 1000);
 
+    // Apply offsets
+    const totalShakeX = (shakeX + breatheX);
+    const totalShakeY = (shakeY + breatheY);
+    this.camera.position.x += totalShakeX;
+    this.camera.position.y += totalShakeY;
+
     // 7. Render via EffectComposer (includes bloom + vignette)
     if (this.composer) this.composer.render(delta);
 
     // 8. Render CSS2D HP bars on top
     if (this.css2d) this.css2d.render(this.scene, this.camera);
+
+    // 9. Revert offsets to prevent drift
+    this.camera.position.x -= totalShakeX;
+    this.camera.position.y -= totalShakeY;
 
     requestAnimationFrame(t => this._tick(t));
   }

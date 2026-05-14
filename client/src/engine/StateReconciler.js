@@ -86,6 +86,11 @@ export class StateReconciler {
 
         if (!mesh || !serverTower) return;
 
+        // DEBUG: Log tower HP to console once per second
+        if (Math.random() > 0.98) {
+          console.log(`[Reconciler] Tower ${player}_${towerKey} HP: ${serverTower.hp} / ${serverTower.maxHp}`);
+        }
+
         updateHPBar(mesh, serverTower.hp, serverTower.maxHp);
 
         const wasAlive = this.prevTowerStates[key] !== false;

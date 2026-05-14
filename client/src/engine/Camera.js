@@ -51,17 +51,17 @@ export function createCameraControls(camera, domElement) {
 
   // Allow zoom (scroll wheel changes frustum for ortho camera)
   controls.enableZoom = true;
-  controls.zoomSpeed  = 1.0;
-  controls.minZoom    = 0.5;   // most zoomed out
-  controls.maxZoom    = 2.5;   // most zoomed in
+  controls.zoomSpeed  = 0.8;
+  controls.minZoom    = 0.85;  // More zoomed in, hides map edges
+  controls.maxZoom    = 2.2;   // Don't zoom too far into models
 
   // Disable panning (keep the arena centered)
   controls.enablePan = false;
 
-  // CLAMP: Prevent camera from going underground
-  // Polar angle = 0 is straight up, PI/2 is horizon, PI is straight down
-  controls.minPolarAngle = 0.3;           // ~17° — don't go fully top-down
-  controls.maxPolarAngle = Math.PI / 2.1; // ~85° — never cross the horizon / go underground
+  // CLAMP: Prevent camera from going underground or too flat
+  // Polar angle = 0 is straight up, PI/2 is horizon
+  controls.minPolarAngle = 0.4;           // ~23° — stay more top-down
+  controls.maxPolarAngle = 1.05;          // ~60° — strictly prevent ground clipping/horizon gaps
 
   // Optional: limit azimuth to prevent full 360° spin (disabled by default)
   // controls.minAzimuthAngle = -Math.PI / 2;

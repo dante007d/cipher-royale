@@ -94,7 +94,7 @@ export class ParticleSystem {
     this.clashes.push(bolt); // Clean up via clashes array
 
     // 3. Screen Shake trigger
-    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 1.5, duration: 400 } }));
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.3, duration: 300 } }));
   }
 
   emitAmbientLightning() {
@@ -136,7 +136,7 @@ export class ParticleSystem {
 
     // 3. GLOBAL EFFECTS
     window.dispatchEvent(new CustomEvent('lightning_strike', { detail: { intensity: 4.0 } }));
-    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 2.5, duration: 300 } }));
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.5, duration: 250 } }));
   }
 
   createGlowTexture(colorStr) {
@@ -289,7 +289,16 @@ export class ParticleSystem {
   }
 
   update(delta) {
-    // Update Motes (incl splashes)
+    // Update Motes (incl splashes) - OPTIMISED: Limited to 150 motes
+    const MOTE_CAP = 150;
+    if (this.motes.length > MOTE_CAP) {
+      const excess = this.motes.length - MOTE_CAP;
+      for (let i = 0; i < excess; i++) {
+        const p = this.motes.shift();
+        this.scene.remove(p);
+      }
+    }
+
     for (let i = this.motes.length - 1; i >= 0; i--) {
       const p = this.motes[i];
       p.position.add(p.userData.vel.clone().multiplyScalar(delta));
@@ -304,6 +313,14 @@ export class ParticleSystem {
       p.userData.vel.y -= 9.8 * delta;
       p.userData.life -= delta;
       p.material.opacity = p.userData.life;
+
+      // HIDE UNDERGROUND: Remove particles that hit the floor
+      if (p.position.y < -0.05) {
+        this.scene.remove(p);
+        this.motes.splice(i, 1);
+        continue;
+      }
+
       if (p.userData.life <= 0) { this.scene.remove(p); this.motes.splice(i, 1); }
     }
 

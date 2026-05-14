@@ -2,9 +2,10 @@ import * as THREE from 'three';
 import useGameStore from '../store/gameStore.js';
 
 export class LaneInput {
-  constructor(camera, clickZones) {
+  constructor(camera, clickZones, scene) {
     this.camera     = camera;
     this.clickZones = clickZones;
+    this.scene      = scene;
     this.raycaster  = new THREE.Raycaster();
     this.pointer    = new THREE.Vector2();
     this.enabled    = false; 
@@ -15,7 +16,7 @@ export class LaneInput {
       this.pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
     });
 
-    window.addEventListener('pointerdown', () => this._onPointerDown());
+    window.addEventListener('pointerdown', (e) => this._onPointerDown(e));
 
     // Listen for card selection from React HUD
     window.addEventListener('card_selected', ({ detail }) => {
@@ -31,22 +32,44 @@ export class LaneInput {
     });
   }
 
-  _onPointerDown() {
+  _onPointerDown(e) {
     if (!this.enabled) return;
+    
+    // ── 1. UI BLOCKER ───────────────────────────────────────────────
+    // If the user clicked a button, the HUD, or anything other than 
+    // the game canvas, ignore it to prevent accidental deployment.
+    if (e.target.tagName !== 'CANVAS') return;
 
-    console.log('[LaneInput] Pointer down at:', this.pointer);
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const hits = this.raycaster.intersectObjects(this.clickZones);
-
-    console.log('[LaneInput] Raycaster hits:', hits.length);
-
+    
+    // ── 2. VISIBILITY FILTER ────────────────────────────────────────
+    // Only intersect with zones that are actually visible (the player's side)
+    const activeZones = this.clickZones.filter(z => z.visible);
+    const hits = this.raycaster.intersectObjects(activeZones);
     if (hits.length > 0) {
-      const lane = hits[0].object.userData.lane;
-      console.log('[LaneInput] Clicked lane:', lane);
+      const hit = hits[0];
+      const zone = hit.object;
+      const lane = zone.userData.lane;
+      const x = zone.position.x;
+      
+      console.log(`[LaneInput] CLICK: WorldX=${hit.point.x.toFixed(2)}, ZoneX=${x}, Lane=${lane}`);
+
+      // Visual Click Marker (Vertical Beam)
+      const beamGeo = new THREE.CylinderGeometry(0.5, 0.5, 40, 16);
+      const beamMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.3 });
+      const marker = new THREE.Mesh(beamGeo, beamMat);
+      marker.position.copy(hit.point);
+      marker.position.y = 20; // Half height
+      this.scene.add(marker);
+      setTimeout(() => this.scene.remove(marker), 800);
+      
+      if (!lane) return;
+      
       // Dispatch lane click back to React
       window.dispatchEvent(new CustomEvent('lane_clicked', {
         detail: { lane, cardType: this.selectedCard }
       }));
+      
       this.enabled      = false;
       this.selectedCard = null;
       this._highlightLanes(false);

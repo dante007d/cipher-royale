@@ -21,8 +21,10 @@ export default function adminRoutes(io) {
     const rooms = roomRegistry.getAll().map(r => ({
       code: r.code,
       state: r.state,
+      winner: r.winner,
       players: r.players?.map(p => p.name) || [],
       timeRemaining: r.timeRemaining,
+      duration: r.settings.durationSeconds,
       createdAt: r.createdAt,
     }));
     console.log(`[Admin] Found ${rooms.length} rooms.`);

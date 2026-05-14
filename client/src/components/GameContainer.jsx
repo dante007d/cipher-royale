@@ -64,7 +64,7 @@ export default function GameContainer() {
     });
 
     const troopPool = new TroopPool(scene, particles);
-    const laneInput = new LaneInput(camera, ground.clickZones);
+    const laneInput = new LaneInput(camera, ground.clickZones, scene);
 
     const systems = {
       lighting,
@@ -85,7 +85,8 @@ export default function GameContainer() {
     engineRef.current = { gameLoop, stateReconciler, systems, css2d };
 
     // 4. Socket Listeners
-    SocketService.connect();
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+    SocketService.connect(SERVER_URL);
     
     // Rejoin if necessary (Restore from localStorage if window state wiped)
     if (!window.__cipherClash) {
@@ -106,10 +107,15 @@ export default function GameContainer() {
     });
 
     SocketService.on('combat_event', (evt) => {
+      const pos = new THREE.Vector3(evt.x, 0.5, evt.y);
       if (evt.type === 'clash') {
-        particles.emitDeathMotes(new THREE.Vector3(evt.x, 0.5, evt.y));
+        particles.emitClash(pos);
       } else if (evt.type === 'explosion') {
-        particles.emitDeathMotes(new THREE.Vector3(evt.x, 0.5, evt.y));
+        particles.emitExplosion(pos, 2.0, 0xffaa00);
+      } else if (evt.type === 'tower_hit') {
+        particles.emitClash(pos); // Reuse clash for hit spark
+      } else if (evt.type === 'tower_fall') {
+        particles.emitTowerDestruction(pos);
       }
     });
 

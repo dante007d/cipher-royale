@@ -31,6 +31,7 @@ export default class GameRoom {
       playerA: { troopsDeployed: 0, questionsCorrect: 0, towersDestroyed: 0 },
       playerB: { troopsDeployed: 0, questionsCorrect: 0, towersDestroyed: 0 },
     };
+    this.winner = null;
   }
 
   buildTowers(owner) {
@@ -83,38 +84,36 @@ export default class GameRoom {
   }
 
   buildStateSnapshot() {
+    // PRE-FILTERED LISTS (Faster than multiple filters)
+    const activeTroops = [];
+    const len = this.troopGroups.length;
+    for (let i = 0; i < len; i++) {
+      const g = this.troopGroups[i];
+      if (g.alive) {
+        activeTroops.push({
+          id: g.id,
+          owner: g.owner,
+          type: g.type,
+          tier: g.tier,
+          lane: g.lane,
+          x: g.x,
+          y: g.y,
+          inCombat: g.inCombat,
+          attackingTowerId: g.attackingTowerId,
+          // Only send unit positions if absolutely necessary (or just send minimal units)
+          units: g.units.map(u => ({ id: u.id, x: u.x, y: u.y, hp: u.hp })),
+        });
+      }
+    }
+
     return {
       tick: this.tickCount,
       timeRemaining: this.timeRemaining,
-      troops: this.troopGroups.filter(g => g.alive).map(g => ({
-        id: g.id,
-        owner: g.owner,
-        type: g.type,
-        tier: g.tier,
-        lane: g.lane,
-        x: g.x,
-        y: g.y,
-        inCombat: g.inCombat,
-        attackingTowerId: g.attackingTowerId,
-        units: g.units.map(u => ({ id: u.id, x: u.x, y: u.y, hp: u.hp })),
-      })),
-      towers: {
-        playerA: {
-          main: { hp: this.towers.playerA.main.hp, maxHp: this.towers.playerA.main.maxHp, alive: this.towers.playerA.main.alive },
-          sub1: { hp: this.towers.playerA.sub1.hp, maxHp: this.towers.playerA.sub1.maxHp, alive: this.towers.playerA.sub1.alive },
-          sub2: { hp: this.towers.playerA.sub2.hp, maxHp: this.towers.playerA.sub2.maxHp, alive: this.towers.playerA.sub2.alive },
-          sub3: { hp: this.towers.playerA.sub3.hp, maxHp: this.towers.playerA.sub3.maxHp, alive: this.towers.playerA.sub3.alive },
-        },
-        playerB: {
-          main: { hp: this.towers.playerB.main.hp, maxHp: this.towers.playerB.main.maxHp, alive: this.towers.playerB.main.alive },
-          sub1: { hp: this.towers.playerB.sub1.hp, maxHp: this.towers.playerB.sub1.maxHp, alive: this.towers.playerB.sub1.alive },
-          sub2: { hp: this.towers.playerB.sub2.hp, maxHp: this.towers.playerB.sub2.maxHp, alive: this.towers.playerB.sub2.alive },
-          sub3: { hp: this.towers.playerB.sub3.hp, maxHp: this.towers.playerB.sub3.maxHp, alive: this.towers.playerB.sub3.alive },
-        },
-      },
+      troops: activeTroops,
+      towers: this.towers, // Send direct reference if possible (Socket.io will clone it)
       tokens: {
-        playerA: this.players[0] ? this.players[0].tokens : 0,
-        playerB: this.players[1] ? this.players[1].tokens : 0,
+        playerA: this.players[0]?.tokens || 0,
+        playerB: this.players[1]?.tokens || 0,
       },
     };
   }

@@ -45,13 +45,13 @@ export class TroopSprite {
   _buildModel(type, bodyColor, helmetColor, isA) {
     // Basic Body with glowing core
     const bodyGeo = new THREE.BoxGeometry(0.5, 0.7, 0.35);
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: bodyColor, roughness: 0.4, metalness: 0.5,
+    const bodyMat = new THREE.MeshPhongMaterial({
+      color: bodyColor, shininess: 30,
       emissive: bodyColor, emissiveIntensity: 0.2
     });
     this.body = new THREE.Mesh(bodyGeo, bodyMat);
     this.body.position.y = 0.55;
-    this.body.castShadow = true;
+    this.body.castShadow = false; // Optimisation: use planar shadows instead
     this.group.add(this.body);
 
     // Glowing Core
@@ -63,10 +63,10 @@ export class TroopSprite {
 
     // Head
     const headGeo = new THREE.BoxGeometry(0.28, 0.28, 0.28);
-    const headMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+    const headMat = new THREE.MeshPhongMaterial({ color: 0x222222, shininess: 10 });
     this.head = new THREE.Mesh(headGeo, headMat);
     this.head.position.y = 1.05;
-    this.head.castShadow = true;
+    this.head.castShadow = false;
     this.group.add(this.head);
 
     // Glowing Eyes
@@ -179,7 +179,7 @@ export class TroopSprite {
       // Demonic Eyes
       const eyeGeo = new THREE.SphereGeometry(0.35, 8, 8);
       const eyeMat = new THREE.MeshStandardMaterial({ 
-        color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 10 
+        color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 1.5 
       });
       this.eyeL.visible = false; 
       this.eyeR.visible = false;
@@ -253,13 +253,13 @@ export class TroopSprite {
 
       // Menacing Pulse for High Tier (Titan)
       if (this.troopType === 'high') {
-        const pulse = 4.0 + Math.sin(this.animTimer * 2) * 2.0;
+        const pulse = 1.2 + Math.sin(this.animTimer * 2) * 0.4;
         if (this.core && this.core.visible) this.core.material.emissiveIntensity = pulse;
         if (this.titanEyes) {
-          this.titanEyes.forEach(eye => eye.material.emissiveIntensity = pulse * 2.5);
+          this.titanEyes.forEach(eye => eye.material.emissiveIntensity = pulse * 1.5);
         }
         if (this.hammerRunes) {
-          this.hammerRunes.forEach(mat => mat.emissiveIntensity = 1.0 + Math.sin(this.animTimer * 4) * 1.5);
+          this.hammerRunes.forEach(mat => mat.emissiveIntensity = 0.5 + Math.sin(this.animTimer * 4) * 0.5);
         }
       }
 
@@ -271,9 +271,9 @@ export class TroopSprite {
       if (this.weapon) this.weapon.rotation.z = -0.3 + Math.sin(this.animTimer * 15) * 0.8;
     }
 
-    // Movement interpolation
-    this.group.position.x = THREE.MathUtils.lerp(this.group.position.x, this.targetX, 0.15);
-    this.group.position.z = THREE.MathUtils.lerp(this.group.position.z, this.targetZ, 0.15);
+    // Movement interpolation (Snappier 0.22 factor for 25 TPS sync)
+    this.group.position.x = THREE.MathUtils.lerp(this.group.position.x, this.targetX, 0.22);
+    this.group.position.z = THREE.MathUtils.lerp(this.group.position.z, this.targetZ, 0.22);
   }
 
   die() {

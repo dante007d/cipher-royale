@@ -1,5 +1,5 @@
 export const GAME_CONFIG = {
-  TICK_RATE_MS:           20,       // 50 TPS
+  TICK_RATE_MS:           40,       // 25 TPS (Optimized for Network stability)
   GAME_DURATION_MS:       300000,   // 5 minutes
   TOKEN_CAP:              20,
   PASSIVE_TOKEN_MS:       8000,

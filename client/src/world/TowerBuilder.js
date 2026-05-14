@@ -1,100 +1,139 @@
 import * as THREE from 'three';
-import { TOWERS } from '@shared/towerConfig.js';
 
 export function buildTowerMesh(type, playerSide, scene) {
-  const group    = new THREE.Group();
+  const group = new THREE.Group();
   const isPlayerA = playerSide === 'playerA';
-  const stoneColor    = 0xa08560; 
-  const stoneDark     = 0x7a6140; 
-  const playerAccent  = isPlayerA ? 0xd63031 : 0x0984e3;
-  const playerBright  = isPlayerA ? 0xff7675 : 0x74b9ff;
-
-  const sizes = {
-    main: { baseW: 1.8, baseD: 1.8, bodyH: 3.0, battH: 0.5, battW: 0.35 },
-    sub:  { baseW: 1.2, baseD: 1.2, bodyH: 1.8, battH: 0.4, battW: 0.25 }
+  
+  // Refined Color Palette: Grungy and Corrupted
+  const colors = {
+    stone: 0x1a0d0d, // Dark, blood-soaked obsidian
+    accent: isPlayerA ? 0xcc0000 : 0x0066aa, // Deep blood red vs Void blue
+    glow: isPlayerA ? 0xff4422 : 0x00ccff, // Sickly orange-red vs Ether blue
+    vein: isPlayerA ? 0x440000 : 0x001133
   };
-  const s = type === 'main' ? sizes.main : sizes.sub;
 
   const stoneMat = new THREE.MeshStandardMaterial({
-    color: stoneColor, roughness: 0.85, metalness: 0.05
+    color: colors.stone, roughness: 0.9, metalness: 0.1, flatShading: true
   });
-  const stoneDarkMat = new THREE.MeshStandardMaterial({
-    color: stoneDark, roughness: 0.9, metalness: 0.0
-  });
-  const accentMat = new THREE.MeshStandardMaterial({
-    color: playerAccent, roughness: 0.6, metalness: 0.2,
-    emissive: playerAccent, emissiveIntensity: 0.1
-  });
-
-  // Base
-  const base = new THREE.Mesh(new THREE.BoxGeometry(s.baseW + 0.3, 0.25, s.baseD + 0.3), stoneDarkMat);
-  base.position.y = 0.125;
-  base.castShadow = base.receiveShadow = true;
-  group.add(base);
-
-  // Body
-  const body = new THREE.Mesh(new THREE.BoxGeometry(s.baseW, s.bodyH, s.baseD), stoneMat);
-  body.position.y = 0.25 + s.bodyH / 2;
-  body.castShadow = body.receiveShadow = true;
-  group.add(body);
-
-  // Band
-  const band = new THREE.Mesh(new THREE.BoxGeometry(s.baseW + 0.02, 0.18, s.baseD + 0.02), accentMat);
-  band.position.y = 0.25 + s.bodyH - 0.35;
-  group.add(band);
-
-  // Battlements
-  const battPositions = [[-s.baseW/2, s.baseD/2], [s.baseW/2, s.baseD/2], [-s.baseW/2, -s.baseD/2], [s.baseW/2, -s.baseD/2]];
-  battPositions.forEach(([bx, bz]) => {
-    const batt = new THREE.Mesh(new THREE.BoxGeometry(s.battW, s.battH, s.battW), stoneMat);
-    batt.position.set(bx, 0.25 + s.bodyH + s.battH/2, bz);
-    group.add(batt);
+  
+  const emissiveMat = new THREE.MeshStandardMaterial({
+    color: colors.accent,
+    emissive: colors.glow,
+    emissiveIntensity: 2.5,
+    transparent: true,
+    opacity: 0.9
   });
 
-  // CORRUPTED CAELID SPIKES
-  const spikeGeo = new THREE.ConeGeometry(0.15, 0.8, 4);
-  const spikeMat = new THREE.MeshStandardMaterial({ color: 0x330000, roughness: 1.0 });
-  for (let i = 0; i < 4; i++) {
-    const spike = new THREE.Mesh(spikeGeo, spikeMat);
-    const angle = (i / 4) * Math.PI * 2;
-    spike.position.set(Math.cos(angle) * s.baseW/2, 1.5, Math.sin(angle) * s.baseD/2);
-    spike.rotation.x = Math.PI / 2;
-    spike.rotation.z = angle;
-    group.add(spike);
+  const veinMat = new THREE.MeshStandardMaterial({
+    color: colors.vein,
+    emissive: colors.accent,
+    emissiveIntensity: 0.5
+  });
+
+  if (type === 'main') {
+    // ── THE CORRUPTED MONOLITH (Main Tower) ──────────────────────────
+    
+    // 1. GNARLED BASE (Twisted Earth)
+    const baseGeo = new THREE.CylinderGeometry(2.5, 3.5, 1.2, 8);
+    const base = new THREE.Mesh(baseGeo, stoneMat);
+    base.position.y = 0.6;
+    base.rotation.y = Math.random();
+    group.add(base);
+
+    // 2. THE TWISTED SPIRES (Thorn-like)
+    for (let i = 0; i < 5; i++) {
+      const spireGroup = new THREE.Group();
+      const angle = (i / 5) * Math.PI * 2;
+      const radius = 1.8;
+      
+      let lastPos = new THREE.Vector3(0, 0, 0);
+      const segments = 4;
+      for (let j = 0; j < segments; j++) {
+        const h = 1.2;
+        const r = 0.4 * (1 - j/segments) + 0.1;
+        const seg = new THREE.Mesh(new THREE.CylinderGeometry(r*0.7, r, h, 5), stoneMat);
+        seg.position.y = h/2;
+        
+        const wrapper = new THREE.Group();
+        wrapper.position.copy(lastPos);
+        wrapper.rotation.z = (Math.random() - 0.5) * 0.4;
+        wrapper.rotation.x = (Math.random() - 0.5) * 0.4;
+        wrapper.add(seg);
+        spireGroup.add(wrapper);
+        
+        lastPos.add(new THREE.Vector3(0, h, 0).applyEuler(wrapper.rotation));
+      }
+      
+      spireGroup.position.set(Math.cos(angle) * radius, 0.5, Math.sin(angle) * radius);
+      spireGroup.rotation.y = -angle;
+      group.add(spireGroup);
+    }
+
+    // 3. THE PULSING CORE (The "Eye")
+    const eyeGeo = new THREE.SphereGeometry(1.0, 16, 16);
+    eyeGeo.scale(1, 1.3, 0.8); // Slit-like eye shape
+    const eye = new THREE.Mesh(eyeGeo, emissiveMat);
+    eye.position.y = 3.5;
+    group.add(eye);
+    group.userData.core = eye;
+
+    // 4. FLOATING THORN RINGS
+    const ringGroup = new THREE.Group();
+    const ringGeo = new THREE.TorusGeometry(2.2, 0.08, 6, 24);
+    const ring = new THREE.Mesh(ringGeo, stoneMat);
+    ring.rotation.x = Math.PI / 2;
+    ringGroup.add(ring);
+    
+    // Add thorns to ring
+    const thornGeo = new THREE.ConeGeometry(0.08, 0.4, 4);
+    for (let i = 0; i < 8; i++) {
+      const thorn = new THREE.Mesh(thornGeo, stoneMat);
+      const a = (i/8) * Math.PI * 2;
+      thorn.position.set(Math.cos(a) * 2.2, 0, Math.sin(a) * 2.2);
+      thorn.rotation.z = Math.PI / 2;
+      thorn.rotation.y = a;
+      ring.add(thorn);
+    }
+    ringGroup.position.y = 3.5;
+    group.add(ringGroup);
+    group.userData.ring = ringGroup;
+
+    // 5. CREEPING VEINS
+    for (let i = 0; i < 12; i++) {
+      const vein = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 4), veinMat);
+      const a = (i/12) * Math.PI * 2;
+      vein.position.set(Math.cos(a) * 1.5, 2.0, Math.sin(a) * 1.5);
+      vein.rotation.x = (Math.random() - 0.5) * 0.5;
+      vein.rotation.z = (Math.random() - 0.5) * 0.5;
+      group.add(vein);
+    }
+
+  } else {
+    // ── THE SUB-TOWER (Flesh Spike) ──────────────────────────────────
+    const bodyGeo = new THREE.CylinderGeometry(0.6, 1.0, 3.5, 6);
+    const body = new THREE.Mesh(bodyGeo, stoneMat);
+    body.position.y = 1.75;
+    group.add(body);
+    group.userData.body = body;
+
+    // Glowing Ribs/Slots
+    for (let i = 0; i < 3; i++) {
+      const rib = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.15, 1.3), emissiveMat);
+      rib.position.y = 1.0 + i * 1.0;
+      group.add(rib);
+    }
+
+    // Top Spike cluster
+    const headSpike = new THREE.Mesh(new THREE.ConeGeometry(0.4, 1.5, 4), stoneMat);
+    headSpike.position.y = 4.25;
+    group.add(headSpike);
   }
 
-  // GLOWING ROT VEIN
-  const veinMat = new THREE.MeshBasicMaterial({ color: 0xff0066, transparent: true, opacity: 0.8 });
-  const vein = new THREE.Mesh(new THREE.PlaneGeometry(0.2, s.bodyH), veinMat);
-  vein.position.set(0, 0.25 + s.bodyH/2, s.baseD/2 + 0.01);
-  group.add(vein);
-
-  // Flag (Tattered)
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.2, 6), stoneDarkMat);
-  pole.position.y = 0.25 + s.bodyH + 0.6;
-  group.add(pole);
-  const flagMat = new THREE.MeshStandardMaterial({ color: playerBright, emissive: playerBright, emissiveIntensity: 0.4, side: THREE.DoubleSide });
-  const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.4), flagMat);
-  flag.position.set(0.25, 0.25 + s.bodyH + 1.1, 0);
-  flag.rotation.z = 0.2;
-  group.add(flag);
-
-  // Rubble group (hidden by default)
-  const rubble = new THREE.Group();
-  for (let i = 0; i < 6; i++) {
-    const r = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.2, 0.4), stoneDarkMat);
-    r.position.set((Math.random() - 0.5) * s.baseW, 0.1, (Math.random() - 0.5) * s.baseD);
-    r.rotation.set(Math.random(), Math.random(), Math.random());
-    rubble.add(r);
-  }
-  rubble.visible = false;
-  group.add(rubble);
-
-  const towerType = type === 'main' ? 'main' : type;
-  group.userData = {
-    type: towerType, playerSide, hp: TOWERS[towerType].maxHp, maxHp: TOWERS[towerType].maxHp,
-    alive: true, damageState: 0, body, flag, rubble, battPositions: group.children.filter(c => c.geometry && c.geometry.type === 'BoxGeometry' && c.position.y > 1.5)
-  };
+  // Common metadata
+  group.userData.type = type;
+  group.userData.playerSide = playerSide;
+  group.userData.alive = true;
+  group.userData.originalEmissive = colors.glow;
 
   scene.add(group);
   return group;
@@ -102,28 +141,39 @@ export function buildTowerMesh(type, playerSide, scene) {
 
 export function updateTowerDamageVisuals(towerGroup, hp, maxHp) {
   const ratio = hp / maxHp;
-  const prevState = towerGroup.userData.damageState;
-  let newState;
-  if (ratio > 0.66) newState = 0;
-  else if (ratio > 0.33) newState = 1;
-  else if (ratio > 0)    newState = 2;
-  else                   newState = 3;
+  const time = performance.now() * 0.001;
+  const { core, ring, body } = towerGroup.userData;
 
-  if (newState === prevState) return;
-  towerGroup.userData.damageState = newState;
+  // Pulse effect
+  const pulse = Math.sin(time * 3) * 0.5 + 1.5;
 
-  const { body, flag, rubble } = towerGroup.userData;
-
-  if (newState === 1) {
-    body.material.color.setHex(0x6B5A3E);
-  } else if (newState === 2) {
-    body.material.color.setHex(0x5C3A1E);
-  } else if (newState === 3) {
-    // DESTROYED: Hide everything but the base and rubble
-    towerGroup.children.forEach(c => {
-      if (c !== rubble && c.position.y > 0.25) c.visible = false;
+  if (towerGroup.userData.type === 'main') {
+    if (core) {
+      core.scale.setScalar(1.0 + Math.sin(time * 4) * 0.05);
+      core.material.emissiveIntensity = pulse * (ratio * 2);
+      core.rotation.y += 0.01;
+    }
+    if (ring) {
+      ring.rotation.y += 0.005;
+      ring.rotation.z = Math.sin(time * 0.5) * 0.1;
+      ring.position.y = 3.5 + Math.sin(time * 1.5) * 0.2;
+    }
+  } else if (body) {
+    // Sub-tower subtle pulse
+    towerGroup.children.forEach(child => {
+      if (child.material && child.material.emissive) {
+        child.material.emissiveIntensity = pulse * ratio;
+      }
     });
-    rubble.visible = true;
+  }
+
+  // Death State
+  if (ratio <= 0 && towerGroup.userData.alive) {
     towerGroup.userData.alive = false;
+    towerGroup.children.forEach(c => {
+      if (c.position.y > 0.5) {
+        c.visible = false;
+      }
+    });
   }
 }

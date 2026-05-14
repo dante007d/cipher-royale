@@ -188,7 +188,6 @@ export function registerSocketHandlers(io) {
       if (group) {
         room.troopGroups.push(group);
         room.stats[player.role].troopsDeployed++;
-        console.log(`[Deploy SUCCESS] ${player.name} -> ${cardType} @ ${lane} (Remaining: ${player.tokens})`);
       } else {
         console.error(`[Deploy ERROR] spawnTroopGroup returned null for ${cardType}`);
       }
