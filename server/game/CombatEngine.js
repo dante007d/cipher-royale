@@ -171,26 +171,31 @@ export function resolveBombExplosions(allGroups, combatEvents) {
 // ═══════════════════════════════════════════
 
 export function getBlockingTower(group, enemyTowers) {
+  const standoff = 0.4;
+  const range = (group.atkRange || 0.5) + standoff;
+
+  // 1. Check Sub-Towers in this lane
   for (const tower of enemyTowers) {
     if (!tower.alive || tower.type === 'main') continue;
     if (tower.lane === group.lane) {
-      if (group.owner === 'playerA') {
-        if (group.y <= tower.y + 0.7) return tower;
-      } else {
-        if (group.y >= tower.y - 0.7) return tower;
-      }
+      const dist = Math.abs(group.y - tower.y);
+      if (dist <= range) return tower;
+      // If we haven't reached it but it's in front of us, it blocks our path to main
+      if (group.owner === 'playerA' && group.y > tower.y) return null; // Path blocked but not in range
+      if (group.owner === 'playerB' && group.y < tower.y) return null;
     }
   }
 
+  // 2. Check Main Tower
   const mainTower = enemyTowers.find(t => t.type === 'main');
   if (mainTower && mainTower.alive) {
-    const blockingSub = enemyTowers.find(t =>
-      t.alive && t.type !== 'main' &&
-      (t.lane === group.lane || t.lane === 'center')
-    );
-    if (!blockingSub) {
-      if (group.owner === 'playerA' && group.y <= mainTower.y + 1.2) return mainTower;
-      if (group.owner === 'playerB' && group.y >= mainTower.y - 1.2) return mainTower;
+    // Only blocked if the SPECIFIC lane tower is still alive
+    const laneSubAlive = enemyTowers.some(t => t.alive && t.type !== 'main' && t.lane === group.lane);
+    
+    if (!laneSubAlive) {
+      const dist = Math.abs(group.y - mainTower.y);
+      const mainRange = range + 0.5; // Slightly larger range for main
+      if (dist <= mainRange) return mainTower;
     }
   }
 

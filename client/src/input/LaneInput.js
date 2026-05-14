@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import useGameStore from '../store/gameStore.js';
 
 export class LaneInput {
   constructor(camera, clickZones) {
@@ -51,9 +52,11 @@ export class LaneInput {
       this._highlightLanes(false);
     }
   }
-
   _highlightLanes(active) {
-    let role = window.__cipherClash?.playerRole;
+    // Try all possible ways to get the player role
+    const storeRole = useGameStore.getState().playerRole;
+    let role = storeRole || window.__cipherClash?.playerRole;
+    
     if (!role) {
       const stored = localStorage.getItem('cipherClash_room');
       if (stored) role = JSON.parse(stored).playerRole;

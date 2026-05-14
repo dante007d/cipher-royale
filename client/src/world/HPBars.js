@@ -4,24 +4,33 @@ export function createTowerHPBar(towerGroup) {
   // Create DOM element
   const wrapper = document.createElement('div');
   wrapper.style.cssText = `
-    width: 72px; height: 8px;
-    background: #111;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 2px;
+    width: 80px; height: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 2px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     overflow: hidden;
     pointer-events: none;
+    backdrop-filter: blur(4px);
   `;
   const fill = document.createElement('div');
   fill.style.cssText = `
     width: 100%; height: 100%;
-    background: #2ECC71;
-    transition: width 0.15s, background 0.3s;
+    background: linear-gradient(90deg, #2ECC71, #27AE60);
+    border-radius: 1px;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
   `;
   wrapper.appendChild(fill);
 
-  // Wrap in CSS2DObject — it tracks 3D position automatically
+  // Wrap in CSS2DObject
   const label = new CSS2DObject(wrapper);
-  label.position.set(0, 4.0, 0); // offset above tower top
+  
+  // Position based on tower type
+  const type = towerGroup.userData.type;
+  const yOffset = type === 'main' ? 4.2 : 2.5; 
+  label.position.set(0, yOffset, 0);
   towerGroup.add(label);
 
   // Store refs
@@ -49,10 +58,15 @@ export function updateHPBar(towerGroup, hp, maxHp) {
     setTimeout(() => { fill.style.filter = 'none'; }, 100);
   }
 
-  if      (ratio > 0.6) fill.style.background = '#2ECC71';
-  else if (ratio > 0.4) fill.style.background = '#F1C40F';
-  else if (ratio > 0.2) fill.style.background = '#E67E22';
-  else                  fill.style.background = '#E74C3C';
+  const green  = 'linear-gradient(90deg, #2ECC71, #27AE60)';
+  const yellow = 'linear-gradient(90deg, #F1C40F, #D4AC0D)';
+  const orange = 'linear-gradient(90deg, #E67E22, #D35400)';
+  const red    = 'linear-gradient(90deg, #E74C3C, #C0392B)';
+
+  if      (ratio > 0.6) fill.style.background = green;
+  else if (ratio > 0.4) fill.style.background = yellow;
+  else if (ratio > 0.2) fill.style.background = orange;
+  else                  fill.style.background = red;
   
   if (ratio <= 0) {
     label.visible = false;

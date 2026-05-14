@@ -113,6 +113,23 @@ class SoundService {
     osc.stop(this.ctx.currentTime + 0.4);
   }
 
+  playNewQuestion() {
+    this.init();
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(this.masterVolume * 0.2, now + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(g);
+    g.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(now + 0.2);
+  }
+
   startAmbience() {
     if (this.ambienceStarted) return;
     this.init();

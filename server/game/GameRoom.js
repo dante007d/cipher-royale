@@ -94,9 +94,9 @@ export default class GameRoom {
         lane: g.lane,
         x: g.x,
         y: g.y,
-        unitCount: g.units.length,
         inCombat: g.inCombat,
         attackingTowerId: g.attackingTowerId,
+        units: g.units.map(u => ({ id: u.id, x: u.x, y: u.y, hp: u.hp })),
       })),
       towers: {
         playerA: {

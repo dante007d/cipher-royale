@@ -7,9 +7,9 @@ export class TroopPool {
     this.particles = particles;
     this.TROOP_TYPES = ['low', 'mid', 'high'];
 
-    // Pre-allocate: 10 per type per player = 180 total
+    // Pre-allocate: 15 per type per player
     this.TROOP_TYPES.forEach(type => {
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 15; i++) {
         const sA = new TroopSprite(type, 'playerA', scene);
         sA.particles = particles;
         this.pool.push(sA);
@@ -24,7 +24,7 @@ export class TroopPool {
   }
 
   spawn(serverTroop) {
-    console.log(`[TroopPool] Spawning: type=${serverTroop.type}, owner=${serverTroop.owner}, x=${serverTroop.x}, y=${serverTroop.y}`);
+    console.log(`[TroopPool] Spawning: type=${serverTroop.type}, owner=${serverTroop.owner}, serverId=${serverTroop.id}`);
 
     // First try exact match
     let sprite = this.pool.find(s =>
@@ -35,13 +35,13 @@ export class TroopPool {
 
     // Fallback: any inactive sprite of same owner
     if (!sprite) {
-      console.warn(`[TroopPool] No exact match for ${serverTroop.type}/${serverTroop.owner}, trying fallback`);
+      console.warn(`[TroopPool] No exact match for ${serverTroop.type}/${serverTroop.owner}, trying fallback from ${this.TROOP_TYPES.join(',')}`);
       sprite = this.pool.find(s => !s.alive && s.owner === serverTroop.owner);
     }
 
     // Last resort: create a new one
     if (!sprite) {
-      console.warn(`[TroopPool] Pool exhausted, creating new troop mesh`);
+      console.error(`[TroopPool] Pool exhausted and fallback failed! Creating new for ${serverTroop.type}`);
       sprite = new TroopSprite(serverTroop.type || 'skirmisher', serverTroop.owner, this.scene);
       sprite.particles = this.particles;
       this.pool.push(sprite);

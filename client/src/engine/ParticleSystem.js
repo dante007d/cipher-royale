@@ -152,44 +152,77 @@ export class ParticleSystem {
   }
 
   emitTowerDestruction(pos) {
-    // 1. Large Core Flash
-    this.emitExplosion(pos, 4.5, 0xffffff); 
-    this.emitExplosion(pos, 6.0, 0xffaa00);
+    // 1. Large Core Flash (Multi-layered)
+    this.emitExplosion(pos, 6.0, 0xffffff); 
+    this.emitExplosion(pos, 8.0, 0xffaa00);
+    this.emitExplosion(pos, 10.0, 0xff5500);
 
-    // 2. Heavy Debris
-    for (let i = 0; i < 30; i++) {
-      const size = 0.2 + Math.random() * 0.5;
+    // 2. Ground Shockwave
+    const rippleMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.8, side: THREE.DoubleSide });
+    const ripple = new THREE.Mesh(this.rippleGeo, rippleMat);
+    ripple.position.copy(pos).setY(0.1);
+    ripple.userData = { life: 1.2, scaleSpeed: 25 };
+    this.scene.add(ripple);
+    this.ripples.push(ripple);
+
+    // 3. Secondary Explosions (Cluster)
+    for(let i=0; i<5; i++) {
+      const offset = new THREE.Vector3((Math.random()-0.5)*4, Math.random()*2, (Math.random()-0.5)*4);
+      setTimeout(() => {
+        this.emitExplosion(pos.clone().add(offset), 3.0 + Math.random()*3, 0xff7700);
+      }, 150 + Math.random()*400);
+    }
+
+    // 4. Heavy Debris (with rotation)
+    for (let i = 0; i < 45; i++) {
+      const size = 0.2 + Math.random() * 0.7;
       const mote = new THREE.Mesh(
         new THREE.BoxGeometry(size, size, size),
-        new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 1.0 })
+        new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 1.0 })
       );
-      mote.position.copy(pos).add(new THREE.Vector3(
-        (Math.random()-0.5)*2,
-        Math.random()*2,
-        (Math.random()-0.5)*2
-      ));
+      mote.position.copy(pos).add(new THREE.Vector3((Math.random()-0.5)*2, Math.random()*3, (Math.random()-0.5)*2));
       mote.userData = {
-        vel: new THREE.Vector3((Math.random()-0.5)*12, 5+Math.random()*15, (Math.random()-0.5)*12),
-        life: 2.0 + Math.random()
+        vel: new THREE.Vector3((Math.random()-0.5)*18, 10+Math.random()*25, (Math.random()-0.5)*18),
+        rotVel: new THREE.Vector3(Math.random()*15, Math.random()*15, Math.random()*15),
+        life: 2.5 + Math.random()*1.5
       };
       this.scene.add(mote);
       this.motes.push(mote);
     }
 
-    // 3. Smoke Clouds
-    for (let i = 0; i < 15; i++) {
+    // 5. Smoke Clouds (Darker & Larger)
+    for (let i = 0; i < 20; i++) {
       const smoke = new THREE.Mesh(
-        new THREE.SphereGeometry(1.2, 6, 6),
-        new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true, opacity: 0.5 })
+        new THREE.SphereGeometry(1.5, 6, 6),
+        new THREE.MeshBasicMaterial({ color: 0x111111, transparent: true, opacity: 0.6 })
       );
-      smoke.position.copy(pos);
+      smoke.position.copy(pos).add(new THREE.Vector3((Math.random()-0.5)*2, Math.random()*2, (Math.random()-0.5)*2));
       smoke.userData = {
-        vel: new THREE.Vector3((Math.random()-0.5)*3, 2+Math.random()*4, (Math.random()-0.5)*3),
-        life: 1.5 + Math.random()
+        vel: new THREE.Vector3((Math.random()-0.5)*4, 3+Math.random()*5, (Math.random()-0.5)*4),
+        life: 2.0 + Math.random()
       };
       this.scene.add(smoke);
       this.motes.push(smoke);
     }
+
+    // 6. Lingering Fire Embers
+    for (let i = 0; i < 25; i++) {
+      const ember = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 4, 4),
+        new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, blending: THREE.AdditiveBlending })
+      );
+      ember.position.copy(pos).add(new THREE.Vector3((Math.random()-0.5)*3, Math.random()*2, (Math.random()-0.5)*3));
+      ember.userData = {
+        vel: new THREE.Vector3((Math.random()-0.5)*6, 5+Math.random()*8, (Math.random()-0.5)*6),
+        life: 1.2 + Math.random()
+      };
+      this.scene.add(ember);
+      this.motes.push(ember);
+    }
+
+    // 7. Global Effects
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 4.5, duration: 650 } }));
+    window.dispatchEvent(new CustomEvent('lightning_strike', { detail: { intensity: 5.0 } }));
   }
 
   emitExplosion(pos, scale = 1.5, color = 0xff5500) {
@@ -213,6 +246,34 @@ export class ParticleSystem {
     this.ripples.push(ripple);
   }
 
+  emitStomp(pos) {
+    // 1. Heavy Dust Shockwave
+    const mat = new THREE.MeshBasicMaterial({ color: 0x332211, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+    const ripple = new THREE.Mesh(this.rippleGeo, mat);
+    ripple.position.copy(pos).setY(0.05);
+    ripple.userData = { life: 0.8, scaleSpeed: 10 };
+    this.scene.add(ripple);
+    this.ripples.push(ripple);
+
+    // 2. Dusty Bits
+    for (let i = 0; i < 12; i++) {
+      const bit = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 0.1, 0.1),
+        new THREE.MeshBasicMaterial({ color: 0x443322 })
+      );
+      bit.position.copy(pos);
+      bit.userData = {
+        vel: new THREE.Vector3((Math.random()-0.5)*4, 1+Math.random()*4, (Math.random()-0.5)*4),
+        life: 0.8
+      };
+      this.scene.add(bit);
+      this.motes.push(bit);
+    }
+
+    // 3. Mini Shake
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.4, duration: 200 } }));
+  }
+
   emitSplash(pos) {
     for (let i = 0; i < 3; i++) {
       const mat = new THREE.MeshBasicMaterial({ color: 0x99aabb, transparent: true, opacity: 0.6 });
@@ -232,6 +293,14 @@ export class ParticleSystem {
     for (let i = this.motes.length - 1; i >= 0; i--) {
       const p = this.motes[i];
       p.position.add(p.userData.vel.clone().multiplyScalar(delta));
+      
+      // Update rotation if rotVel exists
+      if (p.userData.rotVel) {
+        p.rotation.x += p.userData.rotVel.x * delta;
+        p.rotation.y += p.userData.rotVel.y * delta;
+        p.rotation.z += p.userData.rotVel.z * delta;
+      }
+
       p.userData.vel.y -= 9.8 * delta;
       p.userData.life -= delta;
       p.material.opacity = p.userData.life;

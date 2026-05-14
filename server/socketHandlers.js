@@ -26,6 +26,72 @@ export function registerSocketHandlers(io) {
       }
     });
 
+    // ── START DEMO MODE ───────────────────────────
+    socket.on('start_demo_mode', ({ playerName }) => {
+      console.log(`[Demo] Start request from ${playerName} (${socket.id})`);
+      try {
+        const code = `DEMO-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
+        const room = new GameRoom(code, { durationSeconds: 600 });
+        roomRegistry.rooms.set(code, room);
+
+        // Add Human Player
+        const player = {
+          socketId: socket.id,
+          name: playerName || 'Player',
+          index: 0,
+          role: 'playerA',
+          connected: true,
+          tokens: 10, // Extra starting tokens for demo
+          deployCooldown: 0,
+          questionState: questionManager.createPlayerState(),
+        };
+        room.players.push(player);
+        socket.join(code);
+
+        // Add Bot Player
+        const bot = {
+          socketId: 'BOT_SOCKET',
+          name: 'BOT',
+          index: 1,
+          role: 'playerB',
+          connected: true,
+          tokens: 5,
+          deployCooldown: 0,
+          isBot: true,
+          botAnswerTimer: 0,
+        };
+        room.players.push(bot);
+
+        socket.emit('join_result', { success: true, roomCode: code, playerIndex: 0 });
+        
+        // Give client a moment to process join_result before starting countdown
+        setTimeout(() => {
+          room.state = 'COUNTDOWN';
+          const readyData = {
+            playerA: player.name,
+            playerB: bot.name,
+          };
+          
+          // Emit to both (though BOT is not real)
+          io.to(code).emit('room_ready', readyData);
+          // Redundant direct emit to be safe
+          socket.emit('room_ready', readyData);
+
+          setTimeout(() => {
+            if (room.state === 'COUNTDOWN') {
+              startGameLoop(room, io);
+              const q = questionManager.getNextQuestion(player.questionState);
+              if (q) socket.emit('new_question', q);
+            }
+          }, 3500); // 3.5s to match countdown
+        }, 500);
+
+      } catch (err) {
+        console.error(`[Demo] Start FAILED:`, err);
+        socket.emit('error', { message: 'Failed to start demo mode' });
+      }
+    });
+
     // ── JOIN ROOM ─────────────────────────────────
     socket.on('join_room', ({ roomCode, playerName }) => {
       let room = roomRegistry.get(roomCode);
@@ -95,22 +161,21 @@ export function registerSocketHandlers(io) {
 
     // ── DEPLOY TROOP ──────────────────────────────
     socket.on('deploy_troop', ({ roomCode, cardType, lane }) => {
-      console.log(`[Deploy Request] Room:${roomCode}, Type:${cardType}, Lane:${lane}`);
       const room = roomRegistry.get(roomCode);
       if (!room || room.state !== 'ACTIVE') {
-        console.warn(`[Deploy] Room not active or found: ${roomCode}`);
+        console.warn(`[Deploy FAILED] Room:${roomCode} state:${room?.state}. Card:${cardType}`);
         return;
       }
 
       const player = room.players.find(p => p.socketId === socket.id);
       if (!player) {
-        console.warn(`[Deploy] Player not found for socket ${socket.id}`);
+        console.warn(`[Deploy FAILED] Player not found. Socket:${socket.id}`);
         return;
       }
 
       const validation = validateDeployment(player, cardType);
       if (!validation.valid) {
-        console.warn(`[Deploy] Validation failed: ${validation.reason}`);
+        console.warn(`[Deploy FAILED] ${player.name}: ${validation.reason} (${cardType})`);
         return;
       }
 
@@ -118,14 +183,14 @@ export function registerSocketHandlers(io) {
       player.tokens -= validation.cost;
       player.deployCooldown = GAME_CONFIG.DEPLOY_COOLDOWN_MS;
 
-      // Spawn troop group (Passing room to check tower status)
+      // Spawn troop group
       const group = spawnTroopGroup(room, player.role, cardType, lane);
       if (group) {
         room.troopGroups.push(group);
         room.stats[player.role].troopsDeployed++;
-        console.log(`[Deploy] SUCCESS: ${cardType} @ ${lane}`);
+        console.log(`[Deploy SUCCESS] ${player.name} -> ${cardType} @ ${lane} (Remaining: ${player.tokens})`);
       } else {
-        console.error(`[Deploy] SPAWN FAILED: ${cardType}`);
+        console.error(`[Deploy ERROR] spawnTroopGroup returned null for ${cardType}`);
       }
     });
 
@@ -164,33 +229,34 @@ export function registerSocketHandlers(io) {
     // ── REJOIN ROOM ────────────────────────────
     socket.on('rejoin_room', ({ roomCode, playerName }) => {
       const room = roomRegistry.get(roomCode);
-      if (!room) {
-        socket.emit('rejoin_result', { success: false, error: 'Room not found' });
-        return;
+      if (!room) return socket.emit('rejoin_failed', { error: 'Room not found' });
+      
+      const player = room.players.find(p => p.name === playerName);
+      if (!player) return socket.emit('rejoin_failed', { error: 'Player not found' });
+
+      if (room.reconnectTimer) {
+        clearTimeout(room.reconnectTimer);
+        room.reconnectTimer = null;
       }
 
-      let player = room.players.find(p => p.name === playerName);
-      if (!player) {
-        socket.emit('rejoin_result', { success: false, error: 'Player not found in room' });
-        return;
-      }
-
-      // Update socket ID and connection state
       player.socketId = socket.id;
       player.connected = true;
       socket.join(roomCode);
 
-      socket.emit('rejoin_result', { 
-        success: true, 
+      // Send comprehensive resync
+      socket.emit('game_resync', {
+        playerIndex: player.index,
         role: player.role,
         tokens: player.tokens,
-        roomState: room.state 
+        roomState: room.state,
+        gameState: room.buildStateSnapshot(),
+        currentQuestion: player.questionState.currentQuestion,
       });
 
-      console.log(`[Room ${roomCode}] ${playerName} rejoined.`);
-
-      // Send a new question immediately if game is active
-      if (room.state === 'ACTIVE') {
+      io.to(roomCode).emit('opponent_reconnected', { message: `${playerName} reconnected.` });
+      
+      // Also send a new question if they don't have one and game is active
+      if (room.state === 'ACTIVE' && !player.questionState.currentQuestion) {
         const q = questionManager.getNextQuestion(player.questionState);
         if (q) socket.emit('new_question', q);
       }
@@ -257,31 +323,6 @@ export function registerSocketHandlers(io) {
           }, 15000);
         }
       }
-    });
-
-    // ── REJOIN ────────────────────────────────────
-    socket.on('rejoin_room', ({ roomCode, playerName }) => {
-      const room = roomRegistry.get(roomCode);
-      if (!room) return socket.emit('rejoin_failed', { error: 'Room not found' });
-      const player = room.players.find(p => p.name === playerName);
-      if (!player) return socket.emit('rejoin_failed', { error: 'Player not found' });
-
-      if (room.reconnectTimer) {
-        clearTimeout(room.reconnectTimer);
-        room.reconnectTimer = null;
-      }
-
-      player.socketId = socket.id;
-      player.connected = true;
-      socket.join(roomCode);
-
-      socket.emit('game_resync', {
-        playerIndex: player.index,
-        gameState: room.buildStateSnapshot(),
-        currentQuestion: player.questionState.currentQuestion,
-      });
-
-      io.to(roomCode).emit('opponent_reconnected', { message: 'Opponent reconnected.' });
     });
   });
 }

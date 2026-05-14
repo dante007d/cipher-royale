@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { TROOPS } from '@shared/troopConfig.js';
 
 const TROOP_ICONS = {
-  low: '⚔️', mid: '🛡️', high: '🗿',
+  low: '⚔️', mid: '🛡️', high: '🗿'
 };
 
 const TROOP_LABELS = {
-  low: 'Infantry', mid: 'Guardian', high: 'Titan',
+  low: 'Infantry', mid: 'Guardian', high: 'Titan'
 };
 
 console.log('[gameStore] TROOPS Config:', TROOPS);
@@ -34,7 +34,7 @@ const useGameStore = create((set, get) => ({
 
   // Deck + hand
   deck: buildDefaultDeck(),
-  handIndices: [0, 1, 2, 3],
+  handIndices: [0, 1, 2],
   selectedCardIndex: null,
   deployCooldown: false,
 
@@ -112,7 +112,7 @@ const useGameStore = create((set, get) => ({
     tokens: 5, selectedCardIndex: null, deployCooldown: false,
     questionState: 'IDLE', currentQuestion: null, lastAnswerCorrect: null,
     timeRemaining: 300000, gameOver: false, gameResult: null,
-    deck: buildDefaultDeck(), handIndices: [0, 1, 2, 3],
+    deck: buildDefaultDeck(), handIndices: [0, 1, 2],
   }),
 }));
 

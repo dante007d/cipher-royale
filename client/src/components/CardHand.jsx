@@ -14,8 +14,10 @@ export default function CardHand() {
   const handleLaneClick = useCallback((e) => {
     const lane = e.detail.lane;
     const card = deployCard(lane);
+    console.log('[CardHand] handleLaneClick:', lane, 'Card:', card);
     if (card) {
       const info = window.__cipherClash || {};
+      console.log('[CardHand] Emitting deploy_troop:', card.type, 'to room:', info.roomCode);
       SocketService.emit('deploy_troop', {
         roomCode: info.roomCode,
         cardType: card.type,

@@ -59,6 +59,12 @@ export default function LobbyUI() {
       });
     });
 
+    SocketService.on('error', (data) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setStatus('error');
+      setStatusMsg(data.message || 'Server error');
+    });
+
     SocketService.on('join_result', (data) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (data.success) {
@@ -88,6 +94,7 @@ export default function LobbyUI() {
       SocketService.off('join_result');
       SocketService.off('room_ready');
       SocketService.off('room_created');
+      SocketService.off('error');
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
   }, [playerName]);
@@ -112,22 +119,24 @@ export default function LobbyUI() {
     });
   };
 
-  const handleCreate = () => {
+  const handleDemoMode = () => {
     if (!playerName.trim()) return;
+    const cleanName = playerName.trim().slice(0, 16).replace(/[^a-zA-Z0-9_]/g, '');
     setStatus('joining');
-    setStatusMsg('Creating room...');
+    setStatusMsg('Starting Demo Mode...');
 
     // Timeout if server doesn't respond
     timeoutRef.current = setTimeout(() => {
-      if (status === 'joining') {
-        setStatus('error');
-        setStatusMsg('Server timeout. Try again.');
-      }
+      setStatus(current => {
+        if (current === 'joining') {
+          setStatusMsg('Server timeout. Please restart your server to apply changes.');
+          return 'error';
+        }
+        return current;
+      });
     }, 8000);
 
-    SocketService.emit('create_room', {
-      settings: { durationSeconds: 300 },
-    });
+    SocketService.emit('start_demo_mode', { playerName: cleanName });
   };
 
   const handleKeyDown = (e) => {
@@ -184,11 +193,11 @@ export default function LobbyUI() {
           </button>
           <button
             className="btn-primary"
-            onClick={handleCreate}
+            onClick={handleDemoMode}
             disabled={!playerName.trim() || status === 'joining' || status === 'waiting' || status === 'ready'}
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #a855f7)' }}
+            style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
           >
-            {status === 'joining' ? '...' : 'Create Room'}
+            {status === 'joining' ? '...' : 'Demo Mode'}
           </button>
         </div>
 

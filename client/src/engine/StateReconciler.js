@@ -16,45 +16,51 @@ export class StateReconciler {
     this._reconcileTowers(state.towers || {});
   }
 
-  _reconcileTroops(serverTroops) {
-    const serverIds = new Set(serverTroops.map(t => t.id));
+  _reconcileTroops(serverGroups) {
+    const activeUnitIds = new Set();
+    
+    serverGroups.forEach(group => {
+      // Robustness: If server didn't send individual units, treat the group center as a single unit
+      const unitsToRender = (group.units && group.units.length > 0) 
+        ? group.units 
+        : [{ id: group.id, x: group.x, y: group.y, hp: 100 }];
 
-    serverTroops.forEach(st => {
-      // Coordinate normalization (Safety for server units)
-      let sx = st.x;
-      let sy = st.y;
-      if (Math.abs(sx) > 50 || Math.abs(sy) > 50) { sx /= 100; sy /= 100; }
+      unitsToRender.forEach(st => {
+        activeUnitIds.add(st.id);
+        
+        let sx = st.x;
+        let sy = st.y;
+        // Coordinate normalization
+        if (Math.abs(sx) > 50 || Math.abs(sy) > 50) { sx /= 100; sy /= 100; }
 
-      let sprite = this.troopPool.getById(st.id);
-      if (!sprite) {
-        sprite = this.troopPool.spawn({ ...st, x: sx, y: sy });
-        // Deployment Effect
-        const deployPos = new THREE.Vector3(sx, 0, sy);
-        const color = st.owner === 'playerA' ? 0x00ffff : 0xff00ff;
-        this.particles.emitDeployment(deployPos, color);
-      } else {
-        sprite.targetX = sx;
-        sprite.targetZ = sy;
-
-        // Visual Clash Animation
-        if (st.inCombat) {
-          sprite.setAnimation('attack');
-          // Emit sparks at contact point occasionally
-          if (Math.random() > 0.92) {
-            const clashPos = sprite.group.position.clone().add(new THREE.Vector3(0, 0.5, 0));
-            this.particles.emitClash(clashPos);
-          }
-        } else if (st.attackingTowerId) {
-          sprite.setAnimation('attack');
+        let sprite = this.troopPool.getById(st.id);
+        if (!sprite) {
+          sprite = this.troopPool.spawn({ ...st, type: group.type, owner: group.owner, x: sx, y: sy });
+          // Deployment Effect
+          const deployPos = new THREE.Vector3(sx, 0, sy);
+          const color = group.owner === 'playerA' ? 0x00ffff : 0xff00ff;
+          this.particles.emitDeployment(deployPos, color);
         } else {
-          sprite.setAnimation('walk');
+          sprite.targetX = sx;
+          sprite.targetZ = sy;
+
+          // Visual Clash Animation
+          if (group.inCombat || group.attackingTowerId) {
+            sprite.setAnimation('attack');
+            if (Math.random() > 0.95) {
+              const clashPos = sprite.group.position.clone().add(new THREE.Vector3(0, 0.5, 0));
+              this.particles.emitClash(clashPos);
+            }
+          } else {
+            sprite.setAnimation('walk');
+          }
         }
-      }
+      });
     });
 
     // Handle deaths
     this.troopPool.pool.forEach(sprite => {
-      if (sprite.alive && !serverIds.has(sprite.serverId)) {
+      if (sprite.alive && !activeUnitIds.has(sprite.serverId)) {
         const pos = sprite.group.position.clone().add(new THREE.Vector3(0, 0.5, 0));
         
         // Bomb Squad special death

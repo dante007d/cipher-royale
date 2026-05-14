@@ -3,7 +3,10 @@ import { TROOPS, GAME_CONFIG, TOWER_POSITIONS } from '../shared_ref.js';
 
 export function spawnTroopGroup(room, owner, cardType, lane) {
   const config = TROOPS[cardType];
-  if (!config || !room) return null;
+  if (!config || !room) {
+    console.error(`[TroopManager] Invalid spawn: cardType=${cardType}`);
+    return null;
+  }
 
   const laneX = GAME_CONFIG.FIELD.LANE_X[lane];
   
@@ -22,11 +25,15 @@ export function spawnTroopGroup(room, owner, cardType, lane) {
 
   const units = [];
   for (let i = 0; i < config.count; i++) {
+    const offsetX = (i - Math.floor(config.count / 2)) * 0.5;
+    const offsetY = (Math.random() - 0.5) * 0.3; // Slight random staggered start
     units.push({
       id: uuidv4(),
       hp: config.hp,
-      x: laneX + (i - Math.floor(config.count / 2)) * 0.4,
-      y: spawnY,
+      x: laneX + offsetX,
+      y: spawnY + offsetY,
+      offsetX,
+      offsetY
     });
   }
 

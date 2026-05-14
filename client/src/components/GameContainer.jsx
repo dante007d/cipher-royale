@@ -87,8 +87,14 @@ export default function GameContainer() {
     // 4. Socket Listeners
     SocketService.connect();
     
-    // Rejoin if necessary
+    // Rejoin if necessary (Restore from localStorage if window state wiped)
+    if (!window.__cipherClash) {
+      const stored = localStorage.getItem('cipherClash_room');
+      if (stored) window.__cipherClash = JSON.parse(stored);
+    }
+
     if (window.__cipherClash) {
+      console.log('[GameContainer] rejoining room:', window.__cipherClash.roomCode);
       SocketService.emit('rejoin_room', {
         roomCode: window.__cipherClash.roomCode,
         playerName: window.__cipherClash.playerName,

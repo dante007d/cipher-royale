@@ -139,7 +139,7 @@ export function createGround(scene) {
   scene.add(centerLine);
 
   // ── LANE CLICK ZONES (Both Sides) ────────────
-  const clickZoneGeo = new THREE.PlaneGeometry(2.2, 18);
+  const clickZoneGeo = new THREE.PlaneGeometry(2.5, 20); // Increased width and height
   const clickZoneMat = new THREE.MeshBasicMaterial({ color: 0xe0f7fa, transparent: true, opacity: 0, visible: false });
   const clickZones = [];
 
@@ -149,7 +149,11 @@ export function createGround(scene) {
       const zone = new THREE.Mesh(clickZoneGeo, clickZoneMat.clone());
       zone.rotation.x = -Math.PI / 2;
       zone.position.set(x, 0.1, sideZ); 
-      zone.userData.lane = ['left', 'center', 'right'][i];
+      
+      // Lane names should match world X positions consistently
+      const lane = ['left', 'center', 'right'][i];
+      
+      zone.userData.lane = lane;
       zone.userData.side = side;
       zone.userData.isLaneZone = true;
       scene.add(zone);

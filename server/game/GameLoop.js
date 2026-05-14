@@ -1,5 +1,6 @@
 import { GAME_CONFIG } from '../shared_ref.js';
 import { checkCollision, resolveCombat, resolveTroopTowerCombat, resolveBombExplosions, getBlockingTower } from './CombatEngine.js';
+import { spawnTroopGroup, validateDeployment } from './TroopManager.js';
 
 export function startGameLoop(room, io) {
   room.state = 'ACTIVE';
@@ -28,6 +29,9 @@ function tick(room, deltaMs, io) {
   const delta = deltaMs / 1000;
   room.tickCount++;
 
+  // ── 0. BOT AI TICK ───────────────────────────
+  botTick(room, deltaMs, io);
+
   const combatEvents = [];
 
   // ── 1. PASSIVE TOKEN TRICKLE ──────────────────
@@ -50,7 +54,10 @@ function tick(room, deltaMs, io) {
     const direction = group.owner === 'playerA' ? -1 : 1;
     group.y += group.speed * direction * delta;
     group.x = group.laneX;
-    group.units.forEach(u => { u.y = group.y; u.x = group.laneX; });
+    group.units.forEach(u => { 
+      u.y = group.y + (u.offsetY || 0); 
+      u.x = group.x + (u.offsetX || 0); 
+    });
   }
 
   // ── 4. DETECT COLLISIONS & RESOLVE COMBAT ────
@@ -58,8 +65,14 @@ function tick(room, deltaMs, io) {
   for (let i = 0; i < alive.length; i++) {
     for (let j = i + 1; j < alive.length; j++) {
       if (checkCollision(alive[i], alive[j])) {
-        alive[i].inCombat = true;
-        alive[j].inCombat = true;
+        // WAR ENGINE EXCEPTION: Engines do not stop for troops
+        const hasEngine = alive[i].type === 'warEngine' || alive[j].type === 'warEngine';
+        
+        if (!hasEngine) {
+          alive[i].inCombat = true;
+          alive[j].inCombat = true;
+        }
+
         resolveCombat(alive[i], alive[j], delta);
         combatEvents.push({
           type: 'clash',
@@ -94,6 +107,7 @@ function tick(room, deltaMs, io) {
           room.stats[group.owner].towersDestroyed++;
           combatEvents.push({ type: 'tower_fall', x: blocker.x, y: blocker.y, data: { towerId: blocker.id } });
           group.attackingTowerId = null;
+          group.alive = false; // Troops vanish upon destroying a tower
         } else {
           combatEvents.push({ type: 'tower_hit', x: blocker.x, y: blocker.y, data: {} });
         }
@@ -171,4 +185,37 @@ function endGame(room, winnerRole, reason, io) {
   });
 
   console.log(`[GameLoop] Game over in ${room.code}: ${winnerRole} wins (${reason})`);
+}
+
+function botTick(room, deltaMs, io) {
+  room.players.forEach(p => {
+    if (!p.isBot) return;
+
+    // 1. Gain tokens (simulate answering questions)
+    p.botAnswerTimer = (p.botAnswerTimer || 0) + deltaMs;
+    if (p.botAnswerTimer >= 4000) { // Every 4 seconds
+      p.tokens = Math.min(p.tokens + 2, GAME_CONFIG.TOKEN_CAP);
+      p.botAnswerTimer = 0;
+    }
+
+    // 2. Deploy troops
+    if (p.deployCooldown <= 0 && p.tokens >= 4) {
+      const cardTypes = ['infantry', 'guardian', 'titan'];
+      const cardType = cardTypes[Math.floor(Math.random() * cardTypes.length)];
+      const lanes = ['left', 'center', 'right'];
+      const lane = lanes[Math.floor(Math.random() * lanes.length)];
+
+      const validation = validateDeployment(p, cardType);
+      if (validation.valid) {
+        p.tokens -= validation.cost;
+        p.deployCooldown = GAME_CONFIG.DEPLOY_COOLDOWN_MS;
+        const group = spawnTroopGroup(room, p.role, cardType, lane);
+        if (group) {
+          room.troopGroups.push(group);
+          room.stats[p.role].troopsDeployed++;
+          // console.log(`[Bot] Deployed ${cardType} @ ${lane}`);
+        }
+      }
+    }
+  });
 }
