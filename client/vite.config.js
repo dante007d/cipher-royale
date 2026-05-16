@@ -25,7 +25,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../server/public',
+    outDir: process.env.VERCEL ? 'dist' : '../server/public',
     emptyOutDir: true,
   },
 });

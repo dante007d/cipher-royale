@@ -61,7 +61,7 @@ export default class QuestionManager {
     if (!q) return { correct: false, tokens: 0 };
 
     let correct = false;
-    const normalizedAnswer = answer.toLowerCase().trim();
+    const normalizedAnswer = String(answer || '').toLowerCase().trim();
 
     if (q.type === 'fill_blank') {
       // Check accepted answers with Levenshtein distance ≤ 1

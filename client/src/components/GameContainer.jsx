@@ -101,7 +101,7 @@ export default function GameContainer() {
     engineRef.current = { gameLoop, stateReconciler, systems, css2d, disposalRegistry };
 
     // ── SOCKET LOGIC ───────────────────────────────────────────
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL || (import.meta.env.PROD ? window.location.origin : 'http://localhost:3001');
     SocketService.connect(SERVER_URL);
     
     if (!window.__cipherClash) {
