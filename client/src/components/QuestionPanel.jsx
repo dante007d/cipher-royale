@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import useGameStore from '../store/gameStore.js';
 import SocketService from '../services/SocketService.js';
 import SoundService from '../services/SoundService.js';
+import { answerDebounce } from '../input/AnswerDebounce.js';
 
 export default function QuestionPanel() {
   const questionState = useGameStore((s) => s.questionState);
@@ -18,6 +19,7 @@ export default function QuestionPanel() {
   // Listen for new questions from server
   useEffect(() => {
     SocketService.on('new_question', (q) => {
+      answerDebounce.onNewQuestion(); // Clear debounce locks
       setShowFeedback(false);
       useGameStore.getState().setQuestion(q);
       setTimeLeft(q.timeLimit || 15000);
@@ -39,6 +41,7 @@ export default function QuestionPanel() {
     return () => {
       SocketService.off('new_question');
       SocketService.off('answer_result');
+      answerDebounce.destroy();
     };
   }, []);
 
@@ -58,15 +61,24 @@ export default function QuestionPanel() {
   }, [questionState, currentQuestion?.id]);
 
   const submitAnswer = (answer) => {
-    if (questionState !== 'QUESTION') return;
-    setSelectedAnswer(answer);
+    if (questionState !== 'QUESTION' || !currentQuestion) return;
+    
+    // ── DEBOUNCE PROTECTION ─────────────────────────────────────
     const info = window.__cipherClash || {};
-    SocketService.emit('submit_answer', {
-      roomCode: info.roomCode,
-      questionId: currentQuestion.id,
-      answer: answer,
-      clientTimestamp: Date.now(),
-    });
+    const success = answerDebounce.trySubmit(
+      currentQuestion.id,
+      answer,
+      (event, payload) => {
+        payload.roomCode = info.roomCode;
+        SocketService.emit(event, payload);
+      }
+    );
+
+    if (success) {
+      setSelectedAnswer(answer);
+    } else {
+      console.warn('[QuestionPanel] Answer double-submit blocked by debounce.');
+    }
   };
 
   const handleFillSubmit = (e) => {

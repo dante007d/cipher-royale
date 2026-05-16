@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react';
 import useGameStore from '../store/gameStore.js';
 import SocketService from '../services/SocketService.js';
 import SoundService from '../services/SoundService.js';
+import { deploymentLock } from '../input/DeploymentLock.js';
 
 export default function CardHand() {
   const deck = useGameStore((s) => s.deck);
@@ -13,9 +14,21 @@ export default function CardHand() {
 
   const handleLaneClick = useCallback((e) => {
     const lane = e.detail.lane;
+    
+    // ── CLIENT-SIDE LOCK CHECK ────────────────────────────────
+    if (deploymentLock.isLocked) {
+      console.warn('[CardHand] Deployment locked, ignoring click');
+      // Visual feedback could be added here
+      return;
+    }
+
     const card = deployCard(lane);
     console.log('[CardHand] handleLaneClick:', lane, 'Card:', card);
+    
     if (card) {
+      // ── ACQUIRE LOCK ──────────────────────────────────────────
+      if (!deploymentLock.tryAcquire()) return;
+
       const info = window.__cipherClash || {};
       console.log('[CardHand] Emitting deploy_troop:', card.type, 'to room:', info.roomCode);
       SocketService.emit('deploy_troop', {

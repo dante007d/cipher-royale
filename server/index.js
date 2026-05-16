@@ -41,7 +41,31 @@ app.get('*', (req, res) => {
   });
 });
 
+// ── EXPRESS ERROR MIDDLEWARE (catch-all) ──────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('[Express] Unhandled route error:', err.message);
+  res.status(500).json({ error: 'Server error', message: 'Please try again.' });
+});
+
+// ── PROCESS GLOBAL ERROR GUARDS ──────────────────────────────────────────
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[Process] Unhandled rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[Process] Uncaught exception:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error('[Process] Port in use — cannot recover. Exiting.');
+    process.exit(1);
+  }
+});
+
+io.engine.on('connection_error', (err) => {
+  console.error('[Socket.io] Connection error:', err.message);
+});
+
 // ── Socket handlers ────────────────────────
+
 registerSocketHandlers(io);
 
 // Make io accessible for game loop later

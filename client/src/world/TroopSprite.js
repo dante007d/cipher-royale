@@ -190,7 +190,7 @@ export class TroopSprite {
       this.head.add(dEyeL, dEyeR);
       this.titanEyes = [dEyeL, dEyeR];
 
-      this.group.scale.setScalar(1.5);
+      this.group.scale.setScalar(0.8);
     }
   }
 
@@ -238,7 +238,7 @@ export class TroopSprite {
     if (this.animState === 'walk') {
       const prevBob = Math.sin((this.animTimer - delta) * 10);
       const curBob  = Math.sin(this.animTimer * 10);
-      this.group.position.y = curBob * 0.05;
+      this.group.position.y = curBob * 0.02; // Reduced bob
       
       // Emit splash at the bottom of the bob (footstep)
       if (prevBob > 0 && curBob <= 0 && this.particles) {
@@ -253,22 +253,22 @@ export class TroopSprite {
 
       // Menacing Pulse for High Tier (Titan)
       if (this.troopType === 'high') {
-        const pulse = 1.2 + Math.sin(this.animTimer * 2) * 0.4;
+        const pulse = 1.2 + Math.sin(this.animTimer * 2) * 0.2; // Reduced pulse
         if (this.core && this.core.visible) this.core.material.emissiveIntensity = pulse;
         if (this.titanEyes) {
           this.titanEyes.forEach(eye => eye.material.emissiveIntensity = pulse * 1.5);
         }
         if (this.hammerRunes) {
-          this.hammerRunes.forEach(mat => mat.emissiveIntensity = 0.5 + Math.sin(this.animTimer * 4) * 0.5);
+          this.hammerRunes.forEach(mat => mat.emissiveIntensity = 0.5 + Math.sin(this.animTimer * 4) * 0.3);
         }
       }
 
-      if (this.weapon) this.weapon.rotation.x = Math.sin(this.animTimer * 6) * 0.2;
-      if (this.blades) this.blades.rotation.y += delta * 8; // Spinning blades
+      if (this.weapon) this.weapon.rotation.x = Math.sin(this.animTimer * 6) * 0.1; // Reduced weapon swing
+      if (this.blades) this.blades.rotation.y += delta * 5; // Reduced spin
     }
     // Attack swing
     else if (this.animState === 'attack') {
-      if (this.weapon) this.weapon.rotation.z = -0.3 + Math.sin(this.animTimer * 15) * 0.8;
+      if (this.weapon) this.weapon.rotation.z = -0.3 + Math.sin(this.animTimer * 15) * 0.4; // Reduced attack swing
     }
 
     // Movement interpolation (Snappier 0.22 factor for 25 TPS sync)

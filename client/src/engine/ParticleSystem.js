@@ -94,7 +94,7 @@ export class ParticleSystem {
     this.clashes.push(bolt); // Clean up via clashes array
 
     // 3. Screen Shake trigger
-    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.3, duration: 300 } }));
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.1, duration: 200 } }));
   }
 
   emitAmbientLightning() {
@@ -136,7 +136,7 @@ export class ParticleSystem {
 
     // 3. GLOBAL EFFECTS
     window.dispatchEvent(new CustomEvent('lightning_strike', { detail: { intensity: 4.0 } }));
-    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.5, duration: 250 } }));
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.15, duration: 150 } }));
   }
 
   createGlowTexture(colorStr) {
@@ -221,7 +221,7 @@ export class ParticleSystem {
     }
 
     // 7. Global Effects
-    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 4.5, duration: 650 } }));
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 1.5, duration: 400 } }));
     window.dispatchEvent(new CustomEvent('lightning_strike', { detail: { intensity: 5.0 } }));
   }
 
@@ -271,7 +271,7 @@ export class ParticleSystem {
     }
 
     // 3. Mini Shake
-    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.4, duration: 200 } }));
+    window.dispatchEvent(new CustomEvent('camera_shake', { detail: { intensity: 0.1, duration: 150 } }));
   }
 
   emitSplash(pos) {

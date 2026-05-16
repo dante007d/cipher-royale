@@ -22,7 +22,7 @@ export function createIsoCamera(width, height) {
 }
 
 export function resizeCamera(camera, width, height) {
-  const FRUSTUM = 12;
+  const FRUSTUM = 20;
   const aspect  = width / height;
   camera.left   = -FRUSTUM * aspect;
   camera.right  =  FRUSTUM * aspect;

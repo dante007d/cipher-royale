@@ -76,17 +76,7 @@ export function setupEnvironment(scene) {
   scene.add(clouds);
  
   // ═══════════════════════════════════════════════════════════════
-  // 2. GIANT SKELETAL RIBS (Background)
-  const ribMat = new THREE.MeshStandardMaterial({ color: 0xddccbb, roughness: 0.9 });
-  const ribGeo = new THREE.TorusGeometry(8, 0.5, 8, 24, Math.PI);
-  for(let i=0; i<12; i++) { // Increased to 12
-    const rib = new THREE.Mesh(ribGeo, ribMat);
-    const side = i % 2 === 0 ? 1 : -1;
-    rib.position.set(side * (30 + Math.random()*10), -2, -60 + i*10);
-    rib.rotation.y = Math.PI / 2;
-    rib.rotation.x = (Math.random() - 0.5) * 0.5;
-    scene.add(rib);
-  }
+  // 2. [REMOVED BONE STRUCTURE PER USER REQUEST]
 
   // 3. DENSE ROT GRASS SYSTEM
   const GRASS_COUNT = 80000;
@@ -318,13 +308,13 @@ export function setupEnvironment(scene) {
     if (Math.abs(px) < ARENA_X && Math.abs(pz) < 20) continue; // Keep arena clear
 
     const rand = Math.random();
-    if (rand < 0.45) {
+    if (rand < 0.10) { // 10% trees
       const tree = createCreepyTree();
       tree.position.set(px, 0, pz);
       tree.rotation.y = Math.random() * Math.PI * 2;
       tree.scale.setScalar(0.5 + Math.random() * 1.5);
       natureGroup.add(tree);
-    } else if (rand < 0.7) {
+    } else if (rand < 0.35) { // Reduced rocks (25%)
       const rock = new THREE.Mesh(rockGeo, rockMat);
       rock.position.set(px, 0.2, pz);
       rock.rotation.set(Math.random(), Math.random(), Math.random());

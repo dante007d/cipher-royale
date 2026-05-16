@@ -11,25 +11,37 @@ export class LaneInput {
     this.enabled    = false; 
     this.selectedCard = null;
 
-    window.addEventListener('pointermove', e => {
+    this._onPointerMove = (e) => {
       this.pointer.x =  (e.clientX / window.innerWidth)  * 2 - 1;
       this.pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-    });
-
-    window.addEventListener('pointerdown', (e) => this._onPointerDown(e));
+    };
+    
+    this._onPointerDownHandler = (e) => this._onPointerDown(e);
 
     // Listen for card selection from React HUD
-    window.addEventListener('card_selected', ({ detail }) => {
+    this._onCardSelected = ({ detail }) => {
       this.selectedCard = detail.cardType;
       this.enabled      = true;
       this._highlightLanes(true);
-    });
+    };
 
-    window.addEventListener('card_deselected', () => {
+    this._onCardDeselected = () => {
       this.enabled      = false;
       this.selectedCard = null;
       this._highlightLanes(false);
-    });
+    };
+
+    window.addEventListener('pointermove', this._onPointerMove);
+    window.addEventListener('pointerdown', this._onPointerDownHandler);
+    window.addEventListener('card_selected', this._onCardSelected);
+    window.addEventListener('card_deselected', this._onCardDeselected);
+  }
+
+  dispose() {
+    window.removeEventListener('pointermove', this._onPointerMove);
+    window.removeEventListener('pointerdown', this._onPointerDownHandler);
+    window.removeEventListener('card_selected', this._onCardSelected);
+    window.removeEventListener('card_deselected', this._onCardDeselected);
   }
 
   _onPointerDown(e) {
@@ -75,6 +87,7 @@ export class LaneInput {
       this._highlightLanes(false);
     }
   }
+
   _highlightLanes(active) {
     // Try all possible ways to get the player role
     const storeRole = useGameStore.getState().playerRole;

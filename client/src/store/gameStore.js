@@ -49,62 +49,77 @@ const useGameStore = create((set, get) => ({
   gameOver: false,
   gameResult: null,
 
-  setTokens: (n) => set({ tokens: Math.min(n, 20) }),
-  setPlayerRole: (role) => set({ playerRole: role }),
-  setPlayerName: (name) => set({ playerName: name }),
-  setOpponentName: (name) => set({ opponentName: name }),
+  setTokens: (n) => set({ tokens: Math.max(0, Math.min(Number(n) || 0, 20)) }),
+  setPlayerRole: (role) => set({ playerRole: role ? String(role) : null }),
+  setPlayerName: (name) => set({ playerName: name ? String(name).slice(0,20) : '' }),
+  setOpponentName: (name) => set({ opponentName: name ? String(name).slice(0,20) : '' }),
 
   selectCard: (index) => {
-    const state = get();
-    const deckIndex = state.handIndices[index];
-    const card = state.deck[deckIndex];
-    if (!card || card.state !== 'ready' || state.tokens < card.cost) return;
-    set({ selectedCardIndex: index });
+    try {
+      const state = get();
+      if (typeof index !== 'number' || index < 0 || index >= state.handIndices.length) return;
+      const deckIndex = state.handIndices[index];
+      const card = state.deck[deckIndex];
+      if (!card || card.state !== 'ready' || state.tokens < card.cost) return;
+      set({ selectedCardIndex: index });
+    } catch (e) {
+      console.error('[gameStore] selectCard error:', e);
+    }
   },
 
   deployCard: (lane) => {
-    const state = get();
-    if (state.selectedCardIndex === null || state.deployCooldown) return null;
-    const deckIndex = state.handIndices[state.selectedCardIndex];
-    const card = state.deck[deckIndex];
-    if (!card || state.tokens < card.cost) return null;
+    try {
+      const state = get();
+      if (state.selectedCardIndex === null || state.deployCooldown) return null;
+      
+      const deckIndex = state.handIndices[state.selectedCardIndex];
+      const card = state.deck[deckIndex];
+      if (!card || state.tokens < card.cost) return null;
 
-    // Mark card as cycling
-    const newDeck = [...state.deck];
-    newDeck[deckIndex] = { ...card, state: 'cycling' };
+      // Mark card as cycling
+      const newDeck = [...state.deck];
+      newDeck[deckIndex] = { ...card, state: 'cycling' };
 
-    set({
-      deployCooldown: true,
-      selectedCardIndex: null,
-      deck: newDeck,
-    });
-
-    // Restore card after 2s
-    setTimeout(() => {
-      set((s) => {
-        const d = [...s.deck];
-        d[deckIndex] = { ...d[deckIndex], state: 'ready' };
-        return { deck: d, deployCooldown: false };
+      set({
+        deployCooldown: true,
+        selectedCardIndex: null,
+        deck: newDeck,
       });
-    }, 2000);
 
-    return card;
+      // Restore card after 2s
+      setTimeout(() => {
+        set((s) => {
+          if (!s.deck[deckIndex]) return s; // Guard if store was reset
+          const d = [...s.deck];
+          d[deckIndex] = { ...d[deckIndex], state: 'ready' };
+          return { deck: d, deployCooldown: false };
+        });
+      }, 2000);
+
+      return card;
+    } catch (e) {
+      console.error('[gameStore] deployCard error:', e);
+      return null;
+    }
   },
 
-  setQuestion: (q) => set({ currentQuestion: q, questionState: 'QUESTION', lastAnswerCorrect: null }),
+  setQuestion: (q) => {
+    if (!q || typeof q !== 'object') return;
+    set({ currentQuestion: q, questionState: 'QUESTION', lastAnswerCorrect: null });
+  },
 
   answerResult: (correct, tokensAwarded, newTotal) => {
     set({
       questionState: correct ? 'ANSWERED' : 'COOLDOWN',
-      lastAnswerCorrect: correct,
-      lastTokensAwarded: tokensAwarded,
-      tokens: Math.min(newTotal, 20),
+      lastAnswerCorrect: !!correct,
+      lastTokensAwarded: Number(tokensAwarded) || 0,
+      tokens: Math.max(0, Math.min(Number(newTotal) || 0, 20)),
     });
   },
 
   clearQuestionState: () => set({ questionState: 'IDLE', currentQuestion: null }),
 
-  setTimeRemaining: (ms) => set({ timeRemaining: ms }),
+  setTimeRemaining: (ms) => set({ timeRemaining: Math.max(0, Number(ms) || 0) }),
 
   setGameOver: (result) => set({ gameOver: true, gameResult: result }),
 
