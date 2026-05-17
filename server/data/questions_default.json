@@ -423,6 +423,186 @@
       "options": ["900", "9000", "90", "450"],
       "answer": "900",
       "tokens": 7
+    },
+    {
+      "id": "q048",
+      "text": "What is the remainder when 3^75 is divided by 8?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["1", "3", "5", "7"],
+      "answer": "3",
+      "tokens": 7
+    },
+    {
+      "id": "q049",
+      "text": "How many zeros are there at the end of 200! ?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["48", "49", "50", "52"],
+      "answer": "49",
+      "tokens": 7
+    },
+    {
+      "id": "q050",
+      "text": "If x - 1/x = 3, find x² + 1/x².",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["7", "9", "11", "13"],
+      "answer": "11",
+      "tokens": 4
+    },
+    {
+      "id": "q051",
+      "text": "A train travels 360 km at a uniform speed. If the speed had been 5 km/h more, it would have taken 2 hours less. Find the original speed.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["25 km/h", "30 km/h", "35 km/h", "40 km/h"],
+      "answer": "30 km/h",
+      "tokens": 4
+    },
+    {
+      "id": "q052",
+      "text": "How many distinct arrangements can be made using the letters of MISSISSIPPI?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["34650", "25200", "27720", "50400"],
+      "answer": "34650",
+      "tokens": 7
+    },
+    {
+      "id": "q053",
+      "text": "Find the smallest number divisible by 12, 15, and 20.",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["30", "45", "60", "120"],
+      "answer": "60",
+      "tokens": 2
+    },
+    {
+      "id": "q054",
+      "text": "A sum amounts to Rs 13,310 in 3 years and Rs 14,641 in 4 years at compound interest. Find the rate percent per annum.",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["8%", "10%", "12%", "15%"],
+      "answer": "10%",
+      "tokens": 7
+    },
+    {
+      "id": "q055",
+      "text": "If the roots of x² - 6x + k = 0 are equal, find k.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["6", "8", "9", "12"],
+      "answer": "9",
+      "tokens": 4
+    },
+    {
+      "id": "q056",
+      "text": "A card is drawn from a standard deck of 52 cards. What is the probability that it is either a king or a heart?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["4/13", "1/13", "17/52", "16/52"],
+      "answer": "4/13",
+      "tokens": 4
+    },
+    {
+      "id": "q057",
+      "text": "Find the next term: 1, 4, 9, 16, 25, ?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["30", "35", "36", "49"],
+      "answer": "36",
+      "tokens": 2
+    },
+    {
+      "id": "q058",
+      "text": "A and B together can complete a work in 10 days. A alone can do it in 15 days. In how many days can B alone do it?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["20", "25", "30", "35"],
+      "answer": "30",
+      "tokens": 4
+    },
+    {
+      "id": "q059",
+      "text": "How many 3-digit numbers can be formed using digits 1,2,3,4,5 without repetition?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["60", "120", "125", "20"],
+      "answer": "60",
+      "tokens": 2
+    },
+    {
+      "id": "q060",
+      "text": "Find the value of 1³ + 2³ + 3³ + ... + 10³.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["2025", "3025", "4025", "1025"],
+      "answer": "3025",
+      "tokens": 4
+    },
+    {
+      "id": "q061",
+      "text": "What is the probability of getting exactly 2 heads in 3 tosses of a fair coin?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["1/8", "3/8", "1/2", "5/8"],
+      "answer": "3/8",
+      "tokens": 2
+    },
+    {
+      "id": "q062",
+      "text": "Find the number of diagonals in a 20-sided polygon.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["170", "180", "190", "200"],
+      "answer": "170",
+      "tokens": 4
+    },
+    {
+      "id": "q063",
+      "text": "The average of 8 numbers is 21. If one number is removed, the average becomes 19. Find the removed number.",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["30", "32", "35", "40"],
+      "answer": "35",
+      "tokens": 2
+    },
+    {
+      "id": "q064",
+      "text": "What is the units digit of 9^99?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["1", "3", "7", "9"],
+      "answer": "9",
+      "tokens": 7
+    },
+    {
+      "id": "q065",
+      "text": "Find the sum of all integers from 1 to 500 divisible by 5.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["25250", "25000", "25500", "25750"],
+      "answer": "25250",
+      "tokens": 4
+    },
+    {
+      "id": "q066",
+      "text": "A cylinder has radius 7 cm and height 10 cm. Find its volume.",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["1540 cm³", "770 cm³", "980 cm³", "700 cm³"],
+      "answer": "1540 cm³",
+      "tokens": 2
+    },
+    {
+      "id": "q067",
+      "text": "How many factors does 840 have?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["24", "28", "30", "32"],
+      "answer": "32",
+      "tokens": 7
     }
   ]
 }
