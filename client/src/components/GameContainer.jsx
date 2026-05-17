@@ -101,7 +101,7 @@ export default function GameContainer() {
     engineRef.current = { gameLoop, stateReconciler, systems, css2d, disposalRegistry };
 
     // ── SOCKET LOGIC ───────────────────────────────────────────
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL || (import.meta.env.PROD ? 'https://cipher-royale-1.onrender.com' : 'http://localhost:3001');
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL || (import.meta.env.PROD ? 'https://cipher-royale-1.onrender.com' : `http://${window.location.hostname}:3001`);
     console.log('🔌 Connecting to game server at:', SERVER_URL);
     SocketService.connect(SERVER_URL);
     
