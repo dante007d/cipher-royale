@@ -151,13 +151,11 @@ export default function QuestionPanel() {
 
   return (
     <>
-      {showFeedback && (
+      {showFeedback && !lastAnswerCorrect && (
         <div className="feedback-overlay" style={{
           position: 'fixed',
           inset: 0,
-          background: lastAnswerCorrect 
-            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 78, 59, 0.95))' 
-            : 'linear-gradient(135deg, rgba(239, 68, 68, 0.55), rgba(127, 29, 29, 0.98))',
+          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.55), rgba(127, 29, 29, 0.98))',
           backdropFilter: 'blur(16px)',
           display: 'flex',
           flexDirection: 'column',
@@ -171,42 +169,47 @@ export default function QuestionPanel() {
           padding: '20px',
           pointerEvents: 'all'
         }}>
-          {lastAnswerCorrect ? (
-            <div style={{ transform: 'scale(1)', transition: 'transform 0.3s ease' }}>
-              <h1 style={{ fontSize: '4.5rem', textShadow: '0 0 40px #10b981', color: '#10b981', fontWeight: '900', letterSpacing: '0.1em', margin: '0 0 10px 0' }}>
-                CORRECT!
-              </h1>
-              <p style={{ fontSize: '1.6rem', color: '#a7f3d0', marginTop: '10px', letterSpacing: '0.05em' }}>
-                +{useGameStore.getState().lastTokensAwarded} TOKENS AWARDED
+          <div style={{ animation: 'hpShake 0.4s ease-in-out infinite' }}>
+            <h1 style={{ fontSize: '5rem', textShadow: '0 0 45px #ef4444', color: '#ef4444', fontWeight: '900', letterSpacing: '0.15em', margin: '0 0 20px 0' }}>
+              WRONG ANSWER!
+            </h1>
+            <div style={{
+              marginTop: '15px',
+              padding: '30px 45px',
+              background: 'rgba(10, 10, 10, 0.85)',
+              border: '3px solid #ef4444',
+              borderRadius: '20px',
+              boxShadow: '0 0 60px rgba(239, 68, 68, 0.45)',
+              maxWidth: '700px'
+            }}>
+              <p className="roast-text" style={{ fontSize: '2.2rem', color: '#ffffff', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0, lineHeight: '1.3' }}>
+                "{activeRoast}"
               </p>
             </div>
-          ) : (
-            <div style={{ animation: 'hpShake 0.4s ease-in-out infinite' }}>
-              <h1 style={{ fontSize: '5rem', textShadow: '0 0 45px #ef4444', color: '#ef4444', fontWeight: '900', letterSpacing: '0.15em', margin: '0 0 20px 0' }}>
-                WRONG ANSWER!
-              </h1>
-              <div style={{
-                marginTop: '15px',
-                padding: '30px 45px',
-                background: 'rgba(10, 10, 10, 0.85)',
-                border: '3px solid #ef4444',
-                borderRadius: '20px',
-                boxShadow: '0 0 60px rgba(239, 68, 68, 0.45)',
-                maxWidth: '700px'
-              }}>
-                <p className="roast-text" style={{ fontSize: '2.2rem', color: '#ffffff', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0, lineHeight: '1.3' }}>
-                  "{activeRoast}"
-                </p>
-              </div>
-              <p style={{ fontSize: '1.3rem', color: '#fca5a5', marginTop: '30px', opacity: 0.85, letterSpacing: '0.15em' }}>
-                COOLDOWN LOCK ACTIVE (3s)...
-              </p>
-            </div>
-          )}
+            <p style={{ fontSize: '1.3rem', color: '#fca5a5', marginTop: '30px', opacity: 0.85, letterSpacing: '0.15em' }}>
+              COOLDOWN LOCK ACTIVE (3s)...
+            </p>
+          </div>
         </div>
       )}
 
       <div className={`question-panel ${showFeedback ? (lastAnswerCorrect ? 'correct' : 'wrong') : ''}`}>
+        {showFeedback && lastAnswerCorrect && (
+          <div className="feedback-overlay-correct" style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(6, 78, 59, 0.98))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99,
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            <span style={{ fontSize: '1.3rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-display)', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>
+              ✅ CORRECT! (+{useGameStore.getState().lastTokensAwarded} Tokens)
+            </span>
+          </div>
+        )}
         <div className="question-header">
           <span className={`question-difficulty ${currentQuestion.difficulty}`}>
             {currentQuestion.difficulty}

@@ -44,7 +44,7 @@ export default function GameContainer() {
     const camera = createIsoCamera(window.innerWidth, window.innerHeight);
 
     const renderer = createRenderer(canvasRef.current);
-    const css2d = createCSS2DRenderer();
+    const css2d = createCSS2DRenderer(canvasRef.current.parentNode);
     const { composer, vignettePass } = createComposer(renderer, scene, camera);
 
     const cameraControls = createCameraControls(camera, renderer.domElement);

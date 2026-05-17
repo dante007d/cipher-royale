@@ -21,13 +21,17 @@ export function createRenderer(canvas) {
   return renderer;
 }
 
-export function createCSS2DRenderer() {
+export function createCSS2DRenderer(parent) {
   const css2d = new CSS2DRenderer();
   css2d.setSize(window.innerWidth, window.innerHeight);
   css2d.domElement.style.position = 'absolute';
   css2d.domElement.style.top      = '0';
+  css2d.domElement.style.left     = '0';
+  css2d.domElement.style.width    = '100%';
+  css2d.domElement.style.height   = '100%';
   css2d.domElement.style.pointerEvents = 'none'; // click-through
-  document.body.appendChild(css2d.domElement);
+  const targetParent = parent || document.body;
+  targetParent.appendChild(css2d.domElement);
   return css2d;
 }
 
