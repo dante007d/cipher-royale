@@ -11,8 +11,14 @@ class SocketService {
   connect(serverUrl) {
     if (this.socket && this.socket.connected) return this;
     
-    // Hardened config: Enable reconnections, but with backoff and jitter
-    this.socket = io(serverUrl || window.location.origin, {
+    // Dynamically resolve the server URL (production Render or local same-WiFi hostname)
+    const resolvedUrl = serverUrl || 
+      import.meta.env.VITE_SERVER_URL || 
+      (import.meta.env.PROD ? 'https://cipher-royale-1.onrender.com' : `http://${window.location.hostname}:3001`);
+    
+    console.log('🔌 [SocketService] Connecting to:', resolvedUrl);
+    
+    this.socket = io(resolvedUrl, {
       reconnection: true,
       reconnectionAttempts: this.MAX_RECONNECTS,
       reconnectionDelay: 1000,
