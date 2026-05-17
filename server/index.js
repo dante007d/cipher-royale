@@ -13,8 +13,9 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL ? [process.env.CLIENT_URL, 'http://localhost:5173'] : '*',
+    origin: true, // Dynamically allow any requesting origin (bulletproof CORS for Vercel + Local)
     methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 
