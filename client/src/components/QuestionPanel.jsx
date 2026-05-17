@@ -68,7 +68,24 @@ export default function QuestionPanel() {
     "You got folded so fast the laws of physics took notes.",
     "Your enemies stopped sweating and started experimenting.",
     "You’re not a threat. You’re warm-up content.",
-    "The arena doesn’t fear you. It farms you."
+    "The arena doesn’t fear you. It farms you.",
+    "You got humiliated so hard even the game stopped trying to make it fair.",
+    "You play with maximum ego and minimum awareness.",
+    "Your mechanics look hand-crafted to fail under pressure.",
+    "You are what happens when failure gets a keyboard.",
+    "Every time you respawn, the enemy gets a confidence boost.",
+    "You’re not built for competition. You’re built for tutorials.",
+    "You fight like your brain clocked out before the match started.",
+    "The scoreboard tells a story, and your chapter is pure suffering.",
+    "Even your lucky moments look accidental.",
+    "You don’t lose because the enemy is good. You lose because you exist in the fight.",
+    "You’re not getting outplayed anymore. You’re getting studied.",
+    "You make bad decisions with the certainty of a genius.",
+    "The enemy team treats you like free downloadable content.",
+    "You got dismantled so completely the scoreboard looks disrespectful.",
+    "You’re not trash. Trash eventually gets taken out.",
+    "The only thing carrying you is matchmaking mercy.",
+    "You’re the reason tutorials include pictures."
   ];
 
   const [activeRoast, setActiveRoast] = useState('');
@@ -187,7 +204,7 @@ export default function QuestionPanel() {
               </p>
             </div>
             <p style={{ fontSize: '1.3rem', color: '#fca5a5', marginTop: '30px', opacity: 0.85, letterSpacing: '0.15em' }}>
-              COOLDOWN LOCK ACTIVE (3s)...
+              COOLDOWN LOCK ACTIVE (4s)...
             </p>
           </div>
         </div>
