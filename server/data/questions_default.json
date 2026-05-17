@@ -1,140 +1,428 @@
 {
   "version": "1.0",
   "questions": [
-    { 
-      "id": "q001", 
-      "text": "Which cipher shifts each letter in the plaintext by a fixed number of positions down the alphabet?", 
-      "type": "multiple_choice", 
-      "difficulty": "easy", 
-      "options": ["Caesar Cipher", "Vigenere Cipher", "RSA Cipher", "AES Cipher"], 
-      "answer": "Caesar Cipher", 
-      "tokens": 2 
+    {
+      "id": "q001",
+      "text": "How many trailing zeros does 125! (125 factorial) have?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["25", "31", "30", "28"],
+      "answer": "31",
+      "tokens": 7
     },
-    { 
-      "id": "q002", 
-      "text": "Is symmetric encryption faster than asymmetric encryption?", 
-      "type": "true_false", 
-      "difficulty": "easy", 
-      "options": ["True", "False"], 
-      "answer": "True", 
-      "tokens": 2 
+    {
+      "id": "q002",
+      "text": "What is the remainder when 2^100 is divided by 7?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["1", "2", "4", "6"],
+      "answer": "2",
+      "tokens": 7
     },
-    { 
-      "id": "q003", 
-      "text": "Which cipher uses a key-word to perform multiple alphabet shifts?", 
-      "type": "fill_blank", 
-      "difficulty": "medium", 
-      "answer": "vigenere", 
-      "acceptedAnswers": ["vigenere", "vigenère", "vigenere cipher"], 
-      "tokens": 4 
+    {
+      "id": "q003",
+      "text": "Find the last two digits of 7^81.",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["07", "43", "01", "49"],
+      "answer": "07",
+      "tokens": 7
     },
-    { 
-      "id": "q004", 
-      "text": "What is the standard port for secure HTTPS web traffic?", 
-      "type": "multiple_choice", 
-      "difficulty": "easy", 
-      "options": ["80", "22", "443", "8080"], 
-      "answer": "443", 
-      "tokens": 2 
+    {
+      "id": "q004",
+      "text": "A bag has 4 red and 6 blue balls. Two balls are drawn without replacement. What is the probability both are red?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["2/15", "4/15", "1/5", "2/5"],
+      "answer": "2/15",
+      "tokens": 7
     },
-    { 
-      "id": "q005", 
-      "text": "Which type of attack involves an attacker placing themselves between a client and a server to intercept communications?", 
-      "type": "multiple_choice", 
-      "difficulty": "medium", 
-      "options": ["DDoS Attack", "Man-in-the-Middle (MitM)", "SQL Injection", "Phishing"], 
-      "answer": "Man-in-the-Middle (MitM)", 
-      "tokens": 4 
+    {
+      "id": "q005",
+      "text": "A can do a job in 12 days, B in 15 days, C in 20 days. All three work together for 4 days, then A leaves. In how many more days do B and C finish?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["3", "4", "5", "6"],
+      "answer": "3",
+      "tokens": 4
     },
-    { 
-      "id": "q006", 
-      "text": "Which hashing algorithm produces a 256-bit output?", 
-      "type": "fill_blank", 
-      "difficulty": "hard", 
-      "answer": "sha-256", 
-      "acceptedAnswers": ["sha-256", "sha256", "sha 256"], 
-      "tokens": 7 
+    {
+      "id": "q006",
+      "text": "A shopkeeper marks goods 40% above cost price and offers a 20% discount. What is his profit percentage?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["10%", "12%", "14%", "16%"],
+      "answer": "12%",
+      "tokens": 4
     },
-    { 
-      "id": "q007", 
-      "text": "What type of cipher is the Caesar Cipher?", 
-      "type": "multiple_choice", 
-      "difficulty": "medium", 
-      "options": ["Substitution Cipher", "Transposition Cipher", "Block Cipher", "Asymmetric Cipher"], 
-      "answer": "Substitution Cipher", 
-      "tokens": 4 
+    {
+      "id": "q007",
+      "text": "A vessel has 40 L of milk. 10 L is removed and replaced with water. This is done 3 times. What fraction of milk remains?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["27/64", "729/1024", "81/256", "3/4"],
+      "answer": "27/64",
+      "tokens": 7
     },
-    { 
-      "id": "q008", 
-      "text": "Does a hash function allow you to decrypt and recover the original plaintext?", 
-      "type": "true_false", 
-      "difficulty": "easy", 
-      "options": ["True", "False"], 
-      "answer": "False", 
-      "tokens": 2 
+    {
+      "id": "q008",
+      "text": "How many 4-digit numbers are divisible by 5 and have no repeated digits?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["952", "1008", "1344", "1456"],
+      "answer": "952",
+      "tokens": 7
     },
-    { 
-      "id": "q009", 
-      "text": "Which cipher machine was famously cracked by Alan Turing and his team at Bletchley Park during WWII?", 
-      "type": "multiple_choice", 
-      "difficulty": "hard", 
-      "options": ["Enigma", "Lorenz", "Playfair", "Jefferson Wheel"], 
-      "answer": "Enigma", 
-      "tokens": 7 
+    {
+      "id": "q009",
+      "text": "In how many ways can 8 people be divided into two groups of 4 each?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["70", "35", "105", "140"],
+      "answer": "35",
+      "tokens": 7
     },
-    { 
-      "id": "q010", 
-      "text": "What type of attack tries every possible combination of a password until the correct one is found?", 
-      "type": "fill_blank", 
-      "difficulty": "medium", 
-      "answer": "brute force", 
-      "acceptedAnswers": ["brute force", "bruteforce", "brute-force"], 
-      "tokens": 4 
+    {
+      "id": "q010",
+      "text": "If x + 1/x = 5, find x³ + 1/x³.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["110", "115", "120", "125"],
+      "answer": "110",
+      "tokens": 4
     },
-    { 
-      "id": "q011", 
-      "text": "What does 'CIA' stand for in cybersecurity?", 
-      "type": "multiple_choice", 
-      "difficulty": "easy", 
-      "options": ["Confidentiality, Integrity, Availability", "Central Intelligence Agency", "Computer Information Security", "Cryptographic Integrity Analysis"], 
-      "answer": "Confidentiality, Integrity, Availability", 
-      "tokens": 2 
+    {
+      "id": "q011",
+      "text": "The sum of first n terms of an AP is 3n²+5n. Find the 10th term.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["61", "63", "65", "67"],
+      "answer": "63",
+      "tokens": 4
     },
-    { 
-      "id": "q012", 
-      "text": "Can a public key be shared openly with anyone?", 
-      "type": "true_false", 
-      "difficulty": "medium", 
-      "options": ["True", "False"], 
-      "answer": "True", 
-      "tokens": 4 
+    {
+      "id": "q012",
+      "text": "Three numbers in GP have sum 13 and product 27. Find the largest number.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["1", "3", "9", "27"],
+      "answer": "9",
+      "tokens": 4
     },
-    { 
-      "id": "q013", 
-      "text": "What is the name of the oldest known cryptographic transposition device used by the Ancient Greeks?", 
-      "type": "fill_blank", 
-      "difficulty": "hard", 
-      "answer": "scytale", 
-      "acceptedAnswers": ["scytale", "scytala"], 
-      "tokens": 7 
+    {
+      "id": "q013",
+      "text": "Two dice are thrown. What is the probability that the sum of outcomes is a prime number?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["5/12", "7/18", "5/36", "7/12"],
+      "answer": "5/12",
+      "tokens": 7
     },
-    { 
-      "id": "q014", 
-      "text": "Which of the following is an example of an asymmetric encryption algorithm?", 
-      "type": "multiple_choice", 
-      "difficulty": "medium", 
-      "options": ["AES", "DES", "RSA", "Blowfish"], 
-      "answer": "RSA", 
-      "tokens": 4 
+    {
+      "id": "q014",
+      "text": "How many numbers from 1 to 200 are divisible by neither 3 nor 7?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["114", "112", "115", "110"],
+      "answer": "115",
+      "tokens": 4
     },
-    { 
-      "id": "q015", 
-      "text": "What is the key size (in bits) of the strongest standard AES encryption?", 
-      "type": "multiple_choice", 
-      "difficulty": "hard", 
-      "options": ["128", "192", "256", "512"], 
-      "answer": "256", 
-      "tokens": 7 
+    {
+      "id": "q015",
+      "text": "Pipe A fills a tank in 20 min, B in 30 min, and C empties it in 15 min. If all open together, in how many minutes is the tank filled?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["60", "120", "90", "Never fills"],
+      "answer": "60",
+      "tokens": 2
+    },
+    {
+      "id": "q016",
+      "text": "A circle is inscribed in a right triangle with legs 6 and 8. What is the radius of the inscribed circle?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["2", "3", "4", "5"],
+      "answer": "2",
+      "tokens": 4
+    },
+    {
+      "id": "q017",
+      "text": "The difference between CI and SI on Rs 10,000 for 2 years at 10% per annum is:",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["Rs 100", "Rs 200", "Rs 1000", "Rs 150"],
+      "answer": "Rs 100",
+      "tokens": 2
+    },
+    {
+      "id": "q018",
+      "text": "The ratio of ages of A and B is 3:5. Six years later the ratio will be 2:3. Find A's present age.",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["18", "24", "30", "36"],
+      "answer": "18",
+      "tokens": 2
+    },
+    {
+      "id": "q019",
+      "text": "A boat goes 30 km upstream in 6 hours and 30 km downstream in 3 hours. Find the speed of the stream in km/h.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["2.5 km/h", "5 km/h", "3 km/h", "4 km/h"],
+      "answer": "2.5 km/h",
+      "tokens": 4
+    },
+    {
+      "id": "q020",
+      "text": "How many words can be formed from EQUATION using all letters such that all vowels are together?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["2880", "4320", "720", "1440"],
+      "answer": "2880",
+      "tokens": 7
+    },
+    {
+      "id": "q021",
+      "text": "Find the next term in the series: 2, 5, 10, 17, 26, 37, ?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["48", "50", "52", "54"],
+      "answer": "50",
+      "tokens": 2
+    },
+    {
+      "id": "q022",
+      "text": "A speaks truth 3/4 of the time and B speaks truth 4/5. What is the probability they contradict each other on the same fact?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["7/20", "3/20", "4/20", "12/20"],
+      "answer": "7/20",
+      "tokens": 4
+    },
+    {
+      "id": "q023",
+      "text": "If α and β are roots of 2x²−5x+3=0, find α²+β².",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["13/4", "7/4", "37/4", "5/4"],
+      "answer": "13/4",
+      "tokens": 7
+    },
+    {
+      "id": "q024",
+      "text": "By selling 33 items, a trader gains profit equal to the selling price of 11 items. Find his profit percentage.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["25%", "50%", "33.33%", "40%"],
+      "answer": "50%",
+      "tokens": 4
+    },
+    {
+      "id": "q025",
+      "text": "A man covers a distance at 10 km/h and returns at 15 km/h. What is his average speed for the whole journey?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["12 km/h", "12.5 km/h", "13 km/h", "11 km/h"],
+      "answer": "12 km/h",
+      "tokens": 2
+    },
+    {
+      "id": "q026",
+      "text": "How many diagonals does a polygon with 15 sides have?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["90", "91", "92", "105"],
+      "answer": "90",
+      "tokens": 4
+    },
+    {
+      "id": "q027",
+      "text": "In a class of 100 students, 70 like Math, 65 like Science. How many like both (minimum possible)?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["35", "30", "25", "65"],
+      "answer": "35",
+      "tokens": 2
+    },
+    {
+      "id": "q028",
+      "text": "Find the number of positive divisors of 7200.",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["54", "60", "72", "48"],
+      "answer": "54",
+      "tokens": 7
+    },
+    {
+      "id": "q029",
+      "text": "Find the coefficient of x³ in the expansion of (2+3x)⁵.",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["720", "1080", "360", "540"],
+      "answer": "1080",
+      "tokens": 7
+    },
+    {
+      "id": "q030",
+      "text": "Find the smallest positive integer that gives remainder 2 when divided by 3, remainder 3 when divided by 5, and remainder 2 when divided by 7.",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["23", "38", "53", "68"],
+      "answer": "23",
+      "tokens": 7
+    },
+    {
+      "id": "q031",
+      "text": "Find the Harmonic Mean (HM) of 2 and 8.",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["4", "3.2", "5", "4.5"],
+      "answer": "3.2",
+      "tokens": 2
+    },
+    {
+      "id": "q032",
+      "text": "Sum of the series 1² + 2² + 3² + ... + 20² = ?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["2870", "2600", "2850", "3000"],
+      "answer": "2870",
+      "tokens": 4
+    },
+    {
+      "id": "q033",
+      "text": "Of 120 students: 60 study French, 45 study German, 20 study both. How many study neither?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["35", "45", "25", "40"],
+      "answer": "35",
+      "tokens": 2
+    },
+    {
+      "id": "q034",
+      "text": "A sum of money doubles in 8 years under Simple Interest. In how many years will it triple?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["16 years", "20 years", "24 years", "18 years"],
+      "answer": "16 years",
+      "tokens": 2
+    },
+    {
+      "id": "q035",
+      "text": "What is the area of a rhombus whose diagonals are 24 cm and 10 cm?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["120 cm²", "240 cm²", "60 cm²", "140 cm²"],
+      "answer": "120 cm²",
+      "tokens": 2
+    },
+    {
+      "id": "q036",
+      "text": "Find the remainder when 13^99 is divided by 14.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["1", "13", "7", "0"],
+      "answer": "13",
+      "tokens": 4
+    },
+    {
+      "id": "q037",
+      "text": "In how many ways can 6 people sit around a circular table if two specific people must not sit adjacent?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["72", "96", "48", "60"],
+      "answer": "72",
+      "tokens": 7
+    },
+    {
+      "id": "q038",
+      "text": "If sin θ + cos θ = √2, find sin θ · cos θ.",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["1/2", "1", "0", "√2/2"],
+      "answer": "1/2",
+      "tokens": 7
+    },
+    {
+      "id": "q039",
+      "text": "Find the Least Common Multiple (LCM) of 12, 18, and 24.",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["72", "144", "36", "48"],
+      "answer": "72",
+      "tokens": 2
+    },
+    {
+      "id": "q040",
+      "text": "Solve for x: log₂(x+1) + log₂(x-1) = 3.",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["3", "4", "√10", "√11"],
+      "answer": "3",
+      "tokens": 4
+    },
+    {
+      "id": "q041",
+      "text": "What is the remainder when 1! + 2! + 3! + ... + 100! is divided by 10?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["3", "7", "1", "0"],
+      "answer": "3",
+      "tokens": 7
+    },
+    {
+      "id": "q042",
+      "text": "A train 200 m long passes a platform 300 m long in 25 seconds. What is the speed of the train?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["20 m/s", "18 m/s", "15 m/s", "25 m/s"],
+      "answer": "20 m/s",
+      "tokens": 2
+    },
+    {
+      "id": "q043",
+      "text": "A number is first increased by 20% then decreased by 20%. What is the net percentage change?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["-4%", "0%", "+4%", "-2%"],
+      "answer": "-4%",
+      "tokens": 2
+    },
+    {
+      "id": "q044",
+      "text": "Find the area of the triangle with vertices (0,0), (6,0), and (0,4).",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["12", "24", "10", "16"],
+      "answer": "12",
+      "tokens": 2
+    },
+    {
+      "id": "q045",
+      "text": "Speed of a boat in still water is 8 km/h and the stream speed is 2 km/h. What distance is covered downstream in 3.5 hours?",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["35 km", "28 km", "30 km", "21 km"],
+      "answer": "35 km",
+      "tokens": 2
+    },
+    {
+      "id": "q046",
+      "text": "If the Fibonacci sequence starts with a₁=1, a₂=1, and aₙ = aₙ₋₁ + aₙ₋₂, what is the 10th term (a₁₀)?",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["55", "34", "44", "89"],
+      "answer": "55",
+      "tokens": 4
+    },
+    {
+      "id": "q047",
+      "text": "How many 5-digit palindromes exist (where the first digit is non-zero)?",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["900", "9000", "90", "450"],
+      "answer": "900",
+      "tokens": 7
     }
   ]
 }
