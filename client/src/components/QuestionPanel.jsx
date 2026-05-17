@@ -89,6 +89,7 @@ export default function QuestionPanel() {
   ];
 
   const [activeRoast, setActiveRoast] = useState('');
+  const roastIndexRef = useRef(0);
 
   // Listen for new questions from server
   useEffect(() => {
@@ -105,8 +106,9 @@ export default function QuestionPanel() {
     SocketService.on('answer_result', (data) => {
       useGameStore.getState().answerResult(data.correct, data.tokensAwarded, data.newTotal);
       if (!data.correct) {
-        const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
-        setActiveRoast(randomRoast);
+        const nextRoast = roasts[roastIndexRef.current];
+        setActiveRoast(nextRoast);
+        roastIndexRef.current = (roastIndexRef.current + 1) % roasts.length;
       }
       setShowFeedback(true);
       if (data.correct) {
