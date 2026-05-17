@@ -17,17 +17,17 @@ export default function QuestionPanel() {
   const timerRef = useRef(null);
   const roasts = [
     "GO GET A JOB!",
-    "My calculator could solve this faster, and it runs on light bulbs.",
-    "Did you count with your toes for that one?",
-    "Is your math logic powered by a potato battery?",
-    "GATE exams don't have partial marking for wild guesses, you know.",
-    "Please tell me that was a misclick.",
-    "ERROR 404: Brain cells not found.",
-    "Congratulations, you successfully calculated absolute nonsense.",
-    "Stick to Tic-Tac-Toe, champion.",
-    "Even ChatGPT would get fired for this calculation.",
-    "A brick wall answers quicker and more accurately.",
-    "Please hand your math degree back to the cardboard box it came from."
+    "Are you trying to lose, or is this your actual intellectual limit?",
+    "Your brain is running on Dial-Up speed. Absolutely pathetic.",
+    "Please delete the game, close your laptop, and go flip some burgers.",
+    "Even a coin flip has a 50% chance. Yet you still failed.",
+    "Did you drop out of kindergarten, or are you just copy-pasting your failures?",
+    "I've seen lettuce with better analytical skills than this.",
+    "Please never try to calculate anything in real life. It is highly dangerous for you.",
+    "This answer is an insult to mathematics, science, and common sense.",
+    "If failure was an Olympic sport, you'd be a gold medalist.",
+    "My dead grandmother can solve this faster, and she doesn't even have a pulse.",
+    "You are the exact reason why shampoo bottles have instructions."
   ];
 
   const [activeRoast, setActiveRoast] = useState('');
@@ -111,19 +111,57 @@ export default function QuestionPanel() {
   return (
     <div className={`question-panel ${showFeedback ? (lastAnswerCorrect ? 'correct' : 'wrong') : ''}`}>
       {showFeedback && (
-        <div className="feedback-overlay">
-          <div className="feedback-content" style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', textAlign: 'center', padding: '0 20px' }}>
-            {lastAnswerCorrect ? (
-              <span className="feedback-icon correct" style={{ fontSize: '1.4rem' }}>✅ CORRECT! (+{useGameStore.getState().lastTokensAwarded} Tokens)</span>
-            ) : (
-              <>
-                <span className="feedback-icon wrong" style={{ fontSize: '1.4rem' }}>❌ WRONG!</span>
-                <span className="roast-text animate-pulse" style={{ fontSize: '1.1rem', color: '#ff4444', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', maxWidth: '380px' }}>
-                  {activeRoast}
-                </span>
-              </>
-            )}
-          </div>
+        <div className="feedback-overlay" style={{
+          position: 'fixed',
+          inset: 0,
+          background: lastAnswerCorrect 
+            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 78, 59, 0.95))' 
+            : 'linear-gradient(135deg, rgba(239, 68, 68, 0.55), rgba(127, 29, 29, 0.98))',
+          backdropFilter: 'blur(16px)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          animation: 'fadeIn 0.25s ease-out',
+          color: '#ffffff',
+          fontFamily: 'var(--font-display)',
+          textAlign: 'center',
+          padding: '20px',
+          pointerEvents: 'all'
+        }}>
+          {lastAnswerCorrect ? (
+            <div style={{ transform: 'scale(1)', transition: 'transform 0.3s ease' }}>
+              <h1 style={{ fontSize: '4.5rem', textShadow: '0 0 40px #10b981', color: '#10b981', fontWeight: '900', letterSpacing: '0.1em', margin: '0 0 10px 0' }}>
+                CORRECT!
+              </h1>
+              <p style={{ fontSize: '1.6rem', color: '#a7f3d0', marginTop: '10px', letterSpacing: '0.05em' }}>
+                +{useGameStore.getState().lastTokensAwarded} TOKENS AWARDED
+              </p>
+            </div>
+          ) : (
+            <div style={{ animation: 'hpShake 0.4s ease-in-out infinite' }}>
+              <h1 style={{ fontSize: '5rem', textShadow: '0 0 45px #ef4444', color: '#ef4444', fontWeight: '900', letterSpacing: '0.15em', margin: '0 0 20px 0' }}>
+                WRONG ANSWER!
+              </h1>
+              <div style={{
+                marginTop: '15px',
+                padding: '30px 45px',
+                background: 'rgba(10, 10, 10, 0.85)',
+                border: '3px solid #ef4444',
+                borderRadius: '20px',
+                boxShadow: '0 0 60px rgba(239, 68, 68, 0.45)',
+                maxWidth: '700px'
+              }}>
+                <p className="roast-text" style={{ fontSize: '2.2rem', color: '#ffffff', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0, lineHeight: '1.3' }}>
+                  "{activeRoast}"
+                </p>
+              </div>
+              <p style={{ fontSize: '1.3rem', color: '#fca5a5', marginTop: '30px', opacity: 0.85, letterSpacing: '0.15em' }}>
+                COOLDOWN LOCK ACTIVE (3s)...
+              </p>
+            </div>
+          )}
         </div>
       )}
 
