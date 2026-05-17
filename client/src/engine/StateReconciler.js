@@ -94,13 +94,17 @@ export class StateReconciler {
         updateHPBar(mesh, serverTower.hp, serverTower.maxHp);
 
         const wasAlive = this.prevTowerStates[key] !== false;
-        if (!serverTower.alive && wasAlive) {
+        const isCurrentlyAlive = serverTower.alive && serverTower.hp > 0;
+        
+        if (!isCurrentlyAlive && wasAlive) {
           const pos = mesh.position.clone().add(new THREE.Vector3(0, 1, 0));
           this.particles.emitTowerDestruction(pos);
         }
 
+        mesh.visible = isCurrentlyAlive;
+
         updateTowerDamageVisuals(mesh, serverTower.hp, serverTower.maxHp);
-        this.prevTowerStates[key] = serverTower.alive;
+        this.prevTowerStates[key] = isCurrentlyAlive;
       });
     });
   }

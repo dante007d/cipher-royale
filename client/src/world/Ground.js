@@ -161,28 +161,6 @@ export function createGround(scene) {
       zone.position.set(x, 0.1, sideZ); 
       
       const laneName = ['left', 'center', 'right'][i];
-      
-      // PERMANENT LANE LABEL (CSS2D) - Optimised for Low-end
-      const labelDiv = document.createElement('div');
-      labelDiv.className = 'lane-indicator';
-      labelDiv.innerHTML = `<div style="font-size: 10px; opacity: 0.5;">LANE</div>${laneName.toUpperCase()}`;
-      labelDiv.style.cssText = `
-        color: ${isA ? '#ff4d4d' : '#4d94ff'}; 
-        font-family: 'Outfit', sans-serif; 
-        font-weight: 900;
-        font-size: 20px; 
-        text-align: center;
-        letter-spacing: 2px;
-        text-shadow: 0 0 15px rgba(0,0,0,0.8);
-        padding: 5px 10px;
-        border-top: 2px solid currentColor;
-        pointer-events: none;
-        user-select: none;
-      `;
-      const label = new CSS2DObject(labelDiv);
-      // Position label near the player's side of the lane
-      label.position.set(0, 0, isA ? 6 : -6);
-      zone.add(label);
 
       zone.userData.lane = laneName;
       zone.userData.side = side;

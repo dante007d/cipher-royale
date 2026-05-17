@@ -73,7 +73,6 @@ export default function GameContainer() {
       Object.entries(TOWER_POSITIONS[player]).forEach(([key, pos]) => {
         const mesh = buildTowerMesh(pos.type, player, scene);
         mesh.position.set(pos.x, 0, pos.y);
-        createTowerHPBar(mesh);
         towerMeshes[player][key] = mesh;
         disposalRegistry.trackTree(mesh);
       });
