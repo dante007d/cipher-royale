@@ -102,6 +102,10 @@ export default function GameContainer() {
 
     // ── SOCKET LOGIC ───────────────────────────────────────────
     const SERVER_URL = import.meta.env.VITE_SERVER_URL || (import.meta.env.PROD ? window.location.origin : 'http://localhost:3001');
+    console.log('🔌 Connecting to game server at:', SERVER_URL);
+    if (import.meta.env.PROD && !import.meta.env.VITE_SERVER_URL) {
+      console.warn('⚠️ WARNING: VITE_SERVER_URL is not defined! Falling back to window.location.origin. Socket connection will fail on Vercel unless you add VITE_SERVER_URL in Vercel settings and trigger a Redeploy.');
+    }
     SocketService.connect(SERVER_URL);
     
     if (!window.__cipherClash) {
