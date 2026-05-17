@@ -219,7 +219,7 @@ export function registerSocketHandlers(io) {
         if (room.state !== 'ACTIVE') return;
         const q = questionManager.getNextQuestion(player.questionState);
         if (q) socket.emit('new_question', q);
-      }, result.correct ? 1500 : 2000);
+      }, result.correct ? 1500 : 3000);
     }));
 
     // ── REJOIN ROOM ────────────────────────────

@@ -15,6 +15,22 @@ export default function QuestionPanel() {
   const [fillInput, setFillInput] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
   const timerRef = useRef(null);
+  const roasts = [
+    "GO GET A JOB!",
+    "My calculator could solve this faster, and it runs on light bulbs.",
+    "Did you count with your toes for that one?",
+    "Is your math logic powered by a potato battery?",
+    "GATE exams don't have partial marking for wild guesses, you know.",
+    "Please tell me that was a misclick.",
+    "ERROR 404: Brain cells not found.",
+    "Congratulations, you successfully calculated absolute nonsense.",
+    "Stick to Tic-Tac-Toe, champion.",
+    "Even ChatGPT would get fired for this calculation.",
+    "A brick wall answers quicker and more accurately.",
+    "Please hand your math degree back to the cardboard box it came from."
+  ];
+
+  const [activeRoast, setActiveRoast] = useState('');
 
   // Listen for new questions from server
   useEffect(() => {
@@ -30,6 +46,10 @@ export default function QuestionPanel() {
 
     SocketService.on('answer_result', (data) => {
       useGameStore.getState().answerResult(data.correct, data.tokensAwarded, data.newTotal);
+      if (!data.correct) {
+        const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
+        setActiveRoast(randomRoast);
+      }
       setShowFeedback(true);
       if (data.correct) {
         SoundService.playCorrect();
@@ -92,11 +112,16 @@ export default function QuestionPanel() {
     <div className={`question-panel ${showFeedback ? (lastAnswerCorrect ? 'correct' : 'wrong') : ''}`}>
       {showFeedback && (
         <div className="feedback-overlay">
-          <div className="feedback-content">
+          <div className="feedback-content" style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', textAlign: 'center', padding: '0 20px' }}>
             {lastAnswerCorrect ? (
-              <span className="feedback-icon correct">✅ CORRECT! (+{useGameStore.getState().lastTokensAwarded} Tokens)</span>
+              <span className="feedback-icon correct" style={{ fontSize: '1.4rem' }}>✅ CORRECT! (+{useGameStore.getState().lastTokensAwarded} Tokens)</span>
             ) : (
-              <span className="feedback-icon wrong">❌ WRONG! (Cooldown...)</span>
+              <>
+                <span className="feedback-icon wrong" style={{ fontSize: '1.4rem' }}>❌ WRONG!</span>
+                <span className="roast-text animate-pulse" style={{ fontSize: '1.1rem', color: '#ff4444', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', maxWidth: '380px' }}>
+                  {activeRoast}
+                </span>
+              </>
             )}
           </div>
         </div>
