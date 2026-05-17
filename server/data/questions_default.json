@@ -603,6 +603,206 @@
       "options": ["24", "28", "30", "32"],
       "answer": "32",
       "tokens": 7
+    },
+    {
+      "id": "c021",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 10;\n   printf(\"%d\", x--);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["9", "10", "11", "Undefined"],
+      "answer": "10",
+      "tokens": 2
+    },
+    {
+      "id": "c022",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int a = 5;\n   printf(\"%d\", a+++a);\n}",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["10", "11", "12", "Undefined"],
+      "answer": "11",
+      "tokens": 7
+    },
+    {
+      "id": "c023",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   printf(\"%d\", 10/3);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["3", "3.33", "4", "0"],
+      "answer": "3",
+      "tokens": 2
+    },
+    {
+      "id": "c024",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 2;\n   printf(\"%d\", x << 3);\n}",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["6", "8", "16", "24"],
+      "answer": "16",
+      "tokens": 4
+    },
+    {
+      "id": "c025",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int a = 7;\n   printf(\"%d\", a & 4);\n}",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["0", "4", "7", "3"],
+      "answer": "4",
+      "tokens": 4
+    },
+    {
+      "id": "c026",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   char ch = 'A';\n   printf(\"%d\", ch);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["64", "65", "66", "97"],
+      "answer": "65",
+      "tokens": 2
+    },
+    {
+      "id": "c027",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int a = 5;\n   printf(\"%d\", a > 3 && a < 10);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["0", "1", "5", "10"],
+      "answer": "1",
+      "tokens": 2
+    },
+    {
+      "id": "c028",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 5;\n   printf(\"%d\", ~x);\n}",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["-5", "-6", "6", "5"],
+      "answer": "-6",
+      "tokens": 7
+    },
+    {
+      "id": "c029",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int a = 3, b = 4;\n   printf(\"%d\", a*b+a/b);\n}",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["12", "13", "14", "15"],
+      "answer": "12",
+      "tokens": 4
+    },
+    {
+      "id": "c030",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 8;\n   printf(\"%d\", x >> 2);\n}",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["1", "2", "4", "8"],
+      "answer": "2",
+      "tokens": 4
+    },
+    {
+      "id": "c031",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   printf(\"%d\", sizeof(int));\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["2", "4", "8", "Depends"],
+      "answer": "Depends",
+      "tokens": 2
+    },
+    {
+      "id": "c032",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int a = 2;\n   a *= 3 + 2;\n   printf(\"%d\", a);\n}",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["10", "7", "12", "5"],
+      "answer": "10",
+      "tokens": 4
+    },
+    {
+      "id": "c033",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int a = 1;\n   printf(\"%d\", a+++ ++a);\n}",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["4", "5", "Undefined", "6"],
+      "answer": "Undefined",
+      "tokens": 7
+    },
+    {
+      "id": "c034",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 0;\n   printf(\"%d\", x || 5);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["0", "1", "5", "Error"],
+      "answer": "1",
+      "tokens": 2
+    },
+    {
+      "id": "c035",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 3;\n   printf(\"%d\", x==3 ? 10 : 20);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["3", "10", "20", "1"],
+      "answer": "10",
+      "tokens": 2
+    },
+    {
+      "id": "c036",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int a = 5;\n   printf(\"%d\", a+=2*a);\n}",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["10", "12", "15", "20"],
+      "answer": "15",
+      "tokens": 7
+    },
+    {
+      "id": "c037",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 5;\n   printf(\"%d\", x > 2 || x < 1);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["0", "1", "5", "2"],
+      "answer": "1",
+      "tokens": 2
+    },
+    {
+      "id": "c038",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   printf(\"%d\", 17 % 5);\n}",
+      "type": "multiple_choice",
+      "difficulty": "easy",
+      "options": ["2", "3", "4", "5"],
+      "answer": "2",
+      "tokens": 2
+    },
+    {
+      "id": "c039",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nint main(){\n   int x = 4;\n   printf(\"%d\", x*x++);\n}",
+      "type": "multiple_choice",
+      "difficulty": "hard",
+      "options": ["16", "20", "Undefined", "25"],
+      "answer": "Undefined",
+      "tokens": 7
+    },
+    {
+      "id": "c040",
+      "language": "c",
+      "text": "What is the output?\n\n#include<stdio.h>\nfloat x = 5/2;\n   printf(\"%.1f\", x);\n}",
+      "type": "multiple_choice",
+      "difficulty": "medium",
+      "options": ["2.5", "2.0", "2.2", "5.0"],
+      "answer": "2.0",
+      "tokens": 4
     }
   ]
 }

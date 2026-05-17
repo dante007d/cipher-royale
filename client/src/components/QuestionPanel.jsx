@@ -109,7 +109,7 @@ export default function QuestionPanel() {
   if (!currentQuestion) return null;
 
   return (
-    <div className={`question-panel ${showFeedback ? (lastAnswerCorrect ? 'correct' : 'wrong') : ''}`}>
+    <>
       {showFeedback && (
         <div className="feedback-overlay" style={{
           position: 'fixed',
@@ -165,56 +165,99 @@ export default function QuestionPanel() {
         </div>
       )}
 
-      <div className="question-header">
-        <span className={`question-difficulty ${currentQuestion.difficulty}`}>
-          {currentQuestion.difficulty}
-        </span>
-        <div className="question-timer-bar">
-          <div 
-            className="question-timer-fill" 
-            style={{ 
-              width: `${(timeLeft / (currentQuestion.timeLimit || 15000)) * 100}%`,
-              backgroundColor: timeLeft < 5000 ? '#ef4444' : '#06b6d4'
-            }} 
-          />
+      <div className={`question-panel ${showFeedback ? (lastAnswerCorrect ? 'correct' : 'wrong') : ''}`}>
+        <div className="question-header">
+          <span className={`question-difficulty ${currentQuestion.difficulty}`}>
+            {currentQuestion.difficulty}
+          </span>
+          <div className="question-timer-bar">
+            <div 
+              className="question-timer-fill" 
+              style={{ 
+                width: `${(timeLeft / (currentQuestion.timeLimit || 15000)) * 100}%`,
+                backgroundColor: timeLeft < 5000 ? '#ef4444' : '#06b6d4'
+              }} 
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="question-text">{currentQuestion.text}</div>
+        {/* Structured C Code and Question description block renderer */}
+        <div className="question-content-wrapper" style={{ marginBottom: '16px' }}>
+          {(() => {
+            const text = currentQuestion.text;
+            if (currentQuestion.language === 'c' || text.includes('#include')) {
+              const parts = text.split('\n\n');
+              const questionDesc = parts[0];
+              const codePart = parts.slice(1).join('\n\n');
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div className="question-text" style={{ fontSize: '1.05rem', fontWeight: '700', color: '#f1f5f9', margin: 0 }}>
+                    {questionDesc}
+                  </div>
+                  {codePart && (
+                    <pre style={{
+                      background: '#020617',
+                      border: '1.5px solid rgba(6, 182, 212, 0.25)',
+                      borderRadius: '10px',
+                      padding: '12px',
+                      fontFamily: 'Consolas, Monaco, "Fira Code", monospace',
+                      fontSize: '0.85rem',
+                      color: '#22d3ee',
+                      overflowX: 'auto',
+                      textAlign: 'left',
+                      lineHeight: '1.45',
+                      whiteSpace: 'pre',
+                      margin: 0,
+                      boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.8)'
+                    }}>
+                      <code>{codePart}</code>
+                    </pre>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <div className="question-text" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
+                {text}
+              </div>
+            );
+          })()}
+        </div>
 
-      {currentQuestion.type === 'fill_blank' ? (
-        <form onSubmit={handleFillSubmit} className="fill-blank-container">
-          <input
-            className="question-input"
-            type="text"
-            placeholder="Type answer..."
-            value={fillInput}
-            onChange={(e) => setFillInput(e.target.value)}
-            disabled={questionState !== 'QUESTION'}
-            autoFocus
-          />
-          <button
-            className="btn-primary"
-            type="submit"
-            disabled={questionState !== 'QUESTION' || !fillInput.trim()}
-          >
-            Submit
-          </button>
-        </form>
-      ) : (
-        <div className="question-options">
-          {(currentQuestion.options || []).map((opt, i) => (
-            <button
-              key={i}
-              className={`question-option-btn ${selectedAnswer === opt ? (lastAnswerCorrect ? 'correct' : 'wrong') : ''}`}
-              onClick={() => submitAnswer(opt)}
+        {currentQuestion.type === 'fill_blank' ? (
+          <form onSubmit={handleFillSubmit} className="fill-blank-container">
+            <input
+              className="question-input"
+              type="text"
+              placeholder="Type answer..."
+              value={fillInput}
+              onChange={(e) => setFillInput(e.target.value)}
               disabled={questionState !== 'QUESTION'}
+              autoFocus
+            />
+            <button
+              className="btn-primary"
+              type="submit"
+              disabled={questionState !== 'QUESTION' || !fillInput.trim()}
             >
-              {opt}
+              Submit
             </button>
-          ))}
-        </div>
-      )}
-    </div>
+          </form>
+        ) : (
+          <div className="question-options">
+            {(currentQuestion.options || []).map((opt, i) => (
+              <button
+                key={i}
+                className={`question-option-btn ${selectedAnswer === opt ? (lastAnswerCorrect ? 'correct' : 'wrong') : ''}`}
+                onClick={() => submitAnswer(opt)}
+                disabled={questionState !== 'QUESTION'}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
