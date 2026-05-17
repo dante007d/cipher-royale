@@ -16,7 +16,8 @@ export default function HUD() {
         useGameStore.getState().setTimeRemaining(state.timeRemaining);
       }
       if (state.tokens) {
-        const role = info.playerIndex === 0 ? 'playerA' : 'playerB';
+        const currentInfo = window.__cipherClash || {};
+        const role = currentInfo.playerIndex === 0 ? 'playerA' : 'playerB';
         const myTokens = state.tokens[role];
         if (myTokens != null) {
           useGameStore.getState().setTokens(myTokens);
