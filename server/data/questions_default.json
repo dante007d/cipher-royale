@@ -1,35 +1,140 @@
 {
   "version": "1.0",
   "questions": [
-    { "id": "q001", "text": "What is the time complexity of binary search?", "type": "multiple_choice", "difficulty": "medium", "options": ["O(n)", "O(log n)", "O(n²)", "O(1)"], "answer": "O(log n)", "tokens": 4 },
-    { "id": "q002", "text": "Is Python a statically typed language?", "type": "true_false", "difficulty": "easy", "options": ["True", "False"], "answer": "False", "tokens": 2 },
-    { "id": "q003", "text": "What sorting algorithm has worst-case O(n log n)?", "type": "fill_blank", "difficulty": "hard", "answer": "merge sort", "acceptedAnswers": ["merge sort", "mergesort", "heapsort", "heap sort"], "tokens": 7 },
-    { "id": "q004", "text": "Which data structure uses FIFO (First In, First Out)?", "type": "multiple_choice", "difficulty": "easy", "options": ["Stack", "Queue", "Tree", "Graph"], "answer": "Queue", "tokens": 2 },
-    { "id": "q005", "text": "What does HTML stand for?", "type": "multiple_choice", "difficulty": "easy", "options": ["HyperText Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyper Transfer Markup Language"], "answer": "HyperText Markup Language", "tokens": 2 },
-    { "id": "q006", "text": "Which protocol is used for secure web communication?", "type": "multiple_choice", "difficulty": "medium", "options": ["HTTP", "FTP", "HTTPS", "SMTP"], "answer": "HTTPS", "tokens": 4 },
-    { "id": "q007", "text": "Is JavaScript single-threaded?", "type": "true_false", "difficulty": "easy", "options": ["True", "False"], "answer": "True", "tokens": 2 },
-    { "id": "q008", "text": "What is the space complexity of merge sort?", "type": "multiple_choice", "difficulty": "medium", "options": ["O(1)", "O(log n)", "O(n)", "O(n²)"], "answer": "O(n)", "tokens": 4 },
-    { "id": "q009", "text": "What keyword declares a constant in JavaScript?", "type": "fill_blank", "difficulty": "easy", "answer": "const", "acceptedAnswers": ["const"], "tokens": 2 },
-    { "id": "q010", "text": "Which data structure uses LIFO ordering?", "type": "multiple_choice", "difficulty": "easy", "options": ["Queue", "Stack", "Array", "Linked List"], "answer": "Stack", "tokens": 2 },
-    { "id": "q011", "text": "What is the worst-case time complexity of quicksort?", "type": "multiple_choice", "difficulty": "medium", "options": ["O(n log n)", "O(n)", "O(n²)", "O(log n)"], "answer": "O(n²)", "tokens": 4 },
-    { "id": "q012", "text": "Does TCP guarantee packet delivery order?", "type": "true_false", "difficulty": "medium", "options": ["True", "False"], "answer": "True", "tokens": 4 },
-    { "id": "q013", "text": "What traversal visits the root node first?", "type": "fill_blank", "difficulty": "medium", "answer": "preorder", "acceptedAnswers": ["preorder", "pre-order", "pre order"], "tokens": 4 },
-    { "id": "q014", "text": "Which CSS property creates flexible layouts?", "type": "multiple_choice", "difficulty": "easy", "options": ["display: block", "display: flex", "display: inline", "display: table"], "answer": "display: flex", "tokens": 2 },
-    { "id": "q015", "text": "What is the binary representation of decimal 10?", "type": "fill_blank", "difficulty": "medium", "answer": "1010", "acceptedAnswers": ["1010"], "tokens": 4 },
-    { "id": "q016", "text": "Which layer of the OSI model handles routing?", "type": "multiple_choice", "difficulty": "medium", "options": ["Data Link", "Transport", "Network", "Session"], "answer": "Network", "tokens": 4 },
-    { "id": "q017", "text": "Is 0 considered falsy in JavaScript?", "type": "true_false", "difficulty": "easy", "options": ["True", "False"], "answer": "True", "tokens": 2 },
-    { "id": "q018", "text": "What algorithm finds the shortest path in a weighted graph?", "type": "fill_blank", "difficulty": "hard", "answer": "dijkstra", "acceptedAnswers": ["dijkstra", "dijkstras", "dijkstra's"], "tokens": 7 },
-    { "id": "q019", "text": "Which HTTP method is idempotent and used to update resources?", "type": "multiple_choice", "difficulty": "medium", "options": ["POST", "PUT", "PATCH", "DELETE"], "answer": "PUT", "tokens": 4 },
-    { "id": "q020", "text": "What does DNS stand for?", "type": "fill_blank", "difficulty": "medium", "answer": "domain name system", "acceptedAnswers": ["domain name system", "domain name service"], "tokens": 4 },
-    { "id": "q021", "text": "Is a binary search tree always balanced?", "type": "true_false", "difficulty": "easy", "options": ["True", "False"], "answer": "False", "tokens": 2 },
-    { "id": "q022", "text": "What is the maximum number of children a binary tree node can have?", "type": "multiple_choice", "difficulty": "easy", "options": ["1", "2", "3", "Unlimited"], "answer": "2", "tokens": 2 },
-    { "id": "q023", "text": "Which design pattern ensures a class has only one instance?", "type": "fill_blank", "difficulty": "hard", "answer": "singleton", "acceptedAnswers": ["singleton", "singleton pattern"], "tokens": 7 },
-    { "id": "q024", "text": "What is the output of typeof null in JavaScript?", "type": "multiple_choice", "difficulty": "hard", "options": ["null", "undefined", "object", "NaN"], "answer": "object", "tokens": 7 },
-    { "id": "q025", "text": "Which SQL command removes all rows from a table without logging?", "type": "fill_blank", "difficulty": "hard", "answer": "truncate", "acceptedAnswers": ["truncate", "truncate table"], "tokens": 7 },
-    { "id": "q026", "text": "Does UDP provide guaranteed delivery?", "type": "true_false", "difficulty": "easy", "options": ["True", "False"], "answer": "False", "tokens": 2 },
-    { "id": "q027", "text": "What is the default port for HTTP?", "type": "multiple_choice", "difficulty": "medium", "options": ["21", "80", "443", "3000"], "answer": "80", "tokens": 4 },
-    { "id": "q028", "text": "Which git command creates a new branch?", "type": "fill_blank", "difficulty": "medium", "answer": "git branch", "acceptedAnswers": ["git branch", "git checkout -b"], "tokens": 4 },
-    { "id": "q029", "text": "What CSS unit is relative to the viewport width?", "type": "multiple_choice", "difficulty": "medium", "options": ["px", "em", "vw", "rem"], "answer": "vw", "tokens": 4 },
-    { "id": "q030", "text": "What is the amortized time complexity of appending to a dynamic array?", "type": "fill_blank", "difficulty": "hard", "answer": "O(1)", "acceptedAnswers": ["O(1)", "o(1)", "constant", "amortized O(1)"], "tokens": 7 }
+    { 
+      "id": "q001", 
+      "text": "Which cipher shifts each letter in the plaintext by a fixed number of positions down the alphabet?", 
+      "type": "multiple_choice", 
+      "difficulty": "easy", 
+      "options": ["Caesar Cipher", "Vigenere Cipher", "RSA Cipher", "AES Cipher"], 
+      "answer": "Caesar Cipher", 
+      "tokens": 2 
+    },
+    { 
+      "id": "q002", 
+      "text": "Is symmetric encryption faster than asymmetric encryption?", 
+      "type": "true_false", 
+      "difficulty": "easy", 
+      "options": ["True", "False"], 
+      "answer": "True", 
+      "tokens": 2 
+    },
+    { 
+      "id": "q003", 
+      "text": "Which cipher uses a key-word to perform multiple alphabet shifts?", 
+      "type": "fill_blank", 
+      "difficulty": "medium", 
+      "answer": "vigenere", 
+      "acceptedAnswers": ["vigenere", "vigenère", "vigenere cipher"], 
+      "tokens": 4 
+    },
+    { 
+      "id": "q004", 
+      "text": "What is the standard port for secure HTTPS web traffic?", 
+      "type": "multiple_choice", 
+      "difficulty": "easy", 
+      "options": ["80", "22", "443", "8080"], 
+      "answer": "443", 
+      "tokens": 2 
+    },
+    { 
+      "id": "q005", 
+      "text": "Which type of attack involves an attacker placing themselves between a client and a server to intercept communications?", 
+      "type": "multiple_choice", 
+      "difficulty": "medium", 
+      "options": ["DDoS Attack", "Man-in-the-Middle (MitM)", "SQL Injection", "Phishing"], 
+      "answer": "Man-in-the-Middle (MitM)", 
+      "tokens": 4 
+    },
+    { 
+      "id": "q006", 
+      "text": "Which hashing algorithm produces a 256-bit output?", 
+      "type": "fill_blank", 
+      "difficulty": "hard", 
+      "answer": "sha-256", 
+      "acceptedAnswers": ["sha-256", "sha256", "sha 256"], 
+      "tokens": 7 
+    },
+    { 
+      "id": "q007", 
+      "text": "What type of cipher is the Caesar Cipher?", 
+      "type": "multiple_choice", 
+      "difficulty": "medium", 
+      "options": ["Substitution Cipher", "Transposition Cipher", "Block Cipher", "Asymmetric Cipher"], 
+      "answer": "Substitution Cipher", 
+      "tokens": 4 
+    },
+    { 
+      "id": "q008", 
+      "text": "Does a hash function allow you to decrypt and recover the original plaintext?", 
+      "type": "true_false", 
+      "difficulty": "easy", 
+      "options": ["True", "False"], 
+      "answer": "False", 
+      "tokens": 2 
+    },
+    { 
+      "id": "q009", 
+      "text": "Which cipher machine was famously cracked by Alan Turing and his team at Bletchley Park during WWII?", 
+      "type": "multiple_choice", 
+      "difficulty": "hard", 
+      "options": ["Enigma", "Lorenz", "Playfair", "Jefferson Wheel"], 
+      "answer": "Enigma", 
+      "tokens": 7 
+    },
+    { 
+      "id": "q010", 
+      "text": "What type of attack tries every possible combination of a password until the correct one is found?", 
+      "type": "fill_blank", 
+      "difficulty": "medium", 
+      "answer": "brute force", 
+      "acceptedAnswers": ["brute force", "bruteforce", "brute-force"], 
+      "tokens": 4 
+    },
+    { 
+      "id": "q011", 
+      "text": "What does 'CIA' stand for in cybersecurity?", 
+      "type": "multiple_choice", 
+      "difficulty": "easy", 
+      "options": ["Confidentiality, Integrity, Availability", "Central Intelligence Agency", "Computer Information Security", "Cryptographic Integrity Analysis"], 
+      "answer": "Confidentiality, Integrity, Availability", 
+      "tokens": 2 
+    },
+    { 
+      "id": "q012", 
+      "text": "Can a public key be shared openly with anyone?", 
+      "type": "true_false", 
+      "difficulty": "medium", 
+      "options": ["True", "False"], 
+      "answer": "True", 
+      "tokens": 4 
+    },
+    { 
+      "id": "q013", 
+      "text": "What is the name of the oldest known cryptographic transposition device used by the Ancient Greeks?", 
+      "type": "fill_blank", 
+      "difficulty": "hard", 
+      "answer": "scytale", 
+      "acceptedAnswers": ["scytale", "scytala"], 
+      "tokens": 7 
+    },
+    { 
+      "id": "q014", 
+      "text": "Which of the following is an example of an asymmetric encryption algorithm?", 
+      "type": "multiple_choice", 
+      "difficulty": "medium", 
+      "options": ["AES", "DES", "RSA", "Blowfish"], 
+      "answer": "RSA", 
+      "tokens": 4 
+    },
+    { 
+      "id": "q015", 
+      "text": "What is the key size (in bits) of the strongest standard AES encryption?", 
+      "type": "multiple_choice", 
+      "difficulty": "hard", 
+      "options": ["128", "192", "256", "512"], 
+      "answer": "256", 
+      "tokens": 7 
+    }
   ]
 }
